@@ -69,6 +69,15 @@ public class RelationUtil {
       }
    }
 
+   public static FPlayer getPlayer(RelationParticipator rp)
+   {
+      if (rp instanceof FPlayer) {
+         return (FPlayer) rp;
+      }
+
+      return null;
+   }
+
    public static Faction getFaction(RelationParticipator rp) {
       if (rp instanceof Faction) {
          return (Faction)rp;
@@ -79,6 +88,24 @@ public class RelationUtil {
 
    public static ChatColor getColorOfThatToMe(RelationParticipator that, RelationParticipator me) {
       Faction thatFaction = getFaction(that);
+      Faction thisFaction = getFaction(me);
+
+      FPlayer thatPlayer = getPlayer(that);
+      FPlayer thisPlayer = getPlayer(me);
+
+      Relation relation = getRelationTo(that, me);
+
+      if (!relation.equals(Relation.MEMBER)) {
+         if (Conf.trustEnabled) {
+            boolean isTrustedToFaction = thatPlayer == null && thisPlayer != null && thatFaction != null && thatFaction.trustsPlayer(thisPlayer);
+            boolean isFactionTrustingPlayer = thisFaction != null && thatPlayer != null && thisFaction.trustsPlayer(thatPlayer);
+
+            if (isTrustedToFaction || isFactionTrustingPlayer) {
+               return Conf.colorTrusted;
+            }
+         }
+      }
+
       if (thatFaction != null) {
          if (thatFaction.isPeaceful() && thatFaction != getFaction(me)) {
             return Conf.colorPeaceful;
