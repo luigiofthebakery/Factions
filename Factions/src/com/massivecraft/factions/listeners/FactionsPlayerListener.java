@@ -94,7 +94,7 @@ public class FactionsPlayerListener implements Listener {
                }
 
                if (me.isMapAutoUpdating()) {
-                  me.sendMessage(Board.getMap(me.getFaction(), to, player.getLocation().getYaw()));
+                  me.sendMessage(Board.getMap(me, to, player.getLocation().getYaw()));
                   if (spoutClient && Conf.spoutTerritoryOwnersShow) {
                      SpoutFeatures.updateOwnerList(me);
                   }
@@ -234,7 +234,8 @@ public class FactionsPlayerListener implements Listener {
             } else {
                Faction myFaction = me.getFaction();
                Relation rel = myFaction.getRelationTo(otherFaction);
-               if (rel.confDenyUseage()) {
+               boolean trusted = Conf.trustEnabled && otherFaction.trustsPlayer(me);
+               if ((!trusted && rel.confDenyUseage()) || (trusted && Conf.trustDenyUseage)) {
                   if (!justCheck) {
                      me.msg("<b>You can't use <h>%s<b> in the territory of <h>%s<b>.", TextUtil.getMaterialName(material), otherFaction.getTag(myFaction));
                   }
@@ -283,7 +284,21 @@ public class FactionsPlayerListener implements Listener {
 
                Faction myFaction = me.getFaction();
                Relation rel = myFaction.getRelationTo(otherFaction);
-               if (rel.isNeutral() || rel.isEnemy() && Conf.territoryEnemyProtectMaterials || rel.isAlly() && Conf.territoryAllyProtectMaterials) {
+               boolean trusted = Conf.trustEnabled && otherFaction.trustsPlayer(me);
+
+               boolean deny = false;
+               if (trusted) {
+                  if (Conf.trustProtectMaterials) {
+                     deny = true;
+                  }
+               }
+               else {
+                  if (rel.isNeutral() || rel.isEnemy() && Conf.territoryEnemyProtectMaterials || rel.isAlly() && Conf.territoryAllyProtectMaterials) {
+                     deny = true;
+                  }
+               }
+
+               if (deny) {
                   if (!justCheck) {
                      me.msg(
                         "<b>You can't %s <h>%s<b> in the territory of <h>%s<b>.",

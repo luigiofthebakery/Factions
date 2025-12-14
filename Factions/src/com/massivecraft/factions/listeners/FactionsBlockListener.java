@@ -162,6 +162,7 @@ public class FactionsBlockListener implements Listener {
                boolean online = otherFaction.hasPlayersOnline();
                boolean pain = !justCheck && rel.confPainBuild(online);
                boolean deny = rel.confDenyBuild(online);
+               boolean trusted = Conf.trustEnabled && otherFaction.trustsPlayer(me);
                if (pain) {
                   player.damage(Conf.actionDeniedPainAmount);
                   if (!deny) {
@@ -169,7 +170,7 @@ public class FactionsBlockListener implements Listener {
                   }
                }
 
-               if (deny) {
+               if (deny && !trusted) {
                   if (!justCheck) {
                      me.msg("<b>You can't " + action + " in the territory of " + otherFaction.getTag(myFaction));
                   }
@@ -191,6 +192,10 @@ public class FactionsBlockListener implements Listener {
 
                         return false;
                      }
+                  }
+
+                  if (trusted && Conf.trustDenyBuild) {
+                     return false;
                   }
 
                   return true;

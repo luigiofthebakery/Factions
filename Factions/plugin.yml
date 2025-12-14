@@ -86,6 +86,8 @@ permissions:
       factions.version: true
       factions.unclaim: true
       factions.unclaimall: true
+      factions.trust: true
+      factions.untrust: true
   factions.admin:
     description: hand over your admin rights
   factions.admin.any:
@@ -227,3 +229,7 @@ permissions:
     description: unclaim the land where you are standing
   factions.unclaimall:
     description: unclaim all of your factions land
+  factions.trust:
+    description: trust players from outside your faction
+  factions.untrust:
+    description: remove trusted players from your faction
