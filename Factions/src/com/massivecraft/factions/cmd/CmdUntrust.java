@@ -13,7 +13,7 @@ public class CmdUntrust extends FCommand {
 
       this.requiredArgs.add("player name");
 
-      this.permission = Permission.TRUST.node;
+      this.permission = Permission.UNTRUST.node;
       this.disableOnLock = true;
 
       senderMustBePlayer = true;
