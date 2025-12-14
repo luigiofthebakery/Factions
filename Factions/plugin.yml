@@ -230,6 +230,6 @@ permissions:
   factions.unclaimall:
     description: unclaim all of your factions land
   factions.trust:
-    description: trust players from outside your faction
+    description: trust a player
   factions.untrust:
-    description: remove trusted players from your faction
+    description: remove a trusted player
