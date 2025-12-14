@@ -18,6 +18,7 @@ public class Conf {
    public static ChatColor colorEnemy = ChatColor.RED;
    public static ChatColor colorPeaceful = ChatColor.GOLD;
    public static ChatColor colorWar = ChatColor.DARK_RED;
+   public static ChatColor colorTrusted = ChatColor.BLUE;
    public static double powerPlayerMax = 10.0;
    public static double powerPlayerMin = -10.0;
    public static double powerPlayerStarting = 0.0;
@@ -163,6 +164,11 @@ public class Conf {
    public static boolean ownedMessageOnBorder = true;
    public static boolean ownedMessageInsideTerritory = true;
    public static boolean ownedMessageByChunk = false;
+   public static boolean trustEnabled = true;
+   public static boolean trustRequireAdmin = true;
+   public static boolean trustDenyBuild = false;
+   public static boolean trustProtectMaterials = false;
+   public static boolean trustDenyUseage = false;
    public static boolean pistonProtectionThroughDenyBuild = true;
    public static Set<Material> territoryProtectedMaterials = EnumSet.noneOf(Material.class);
    public static Set<Material> territoryDenyUseageMaterials = EnumSet.noneOf(Material.class);
