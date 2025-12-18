@@ -8,10 +8,7 @@ import com.massivecraft.factions.integration.Econ;
 import com.massivecraft.factions.integration.LWCFeatures;
 import com.massivecraft.factions.integration.SpoutFeatures;
 import com.massivecraft.factions.integration.Worldguard;
-import com.massivecraft.factions.struct.ChatMode;
-import com.massivecraft.factions.struct.Permission;
-import com.massivecraft.factions.struct.Relation;
-import com.massivecraft.factions.struct.Role;
+import com.massivecraft.factions.struct.*;
 import com.massivecraft.factions.util.RelationUtil;
 import com.massivecraft.factions.zcore.persist.PlayerEntity;
 import java.util.HashSet;
@@ -416,7 +413,7 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator {
             msg = msg + " - " + factionHere.getDescription();
          }
 
-         this.sendMessage(msg);
+         this.notify(msg, NotificationType.CHUNK_BOUNDARY_TRANSITION);
       }
    }
 
@@ -625,6 +622,34 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator {
    public boolean shouldBeSaved() {
       return (this.hasFaction() || this.getPowerRounded() != this.getPowerMaxRounded() && this.getPowerRounded() != (int)Math.round(Conf.powerPlayerStarting))
          && !this.deleteMe;
+   }
+
+   public NotificationPosition getNotificationPositionByType(NotificationType type) {
+      return Conf.defaultNotificationPosition;
+   }
+
+   public void notify(String message) {
+      this.notify(message, NotificationPosition.DEFAULT);
+   }
+
+   public void notify(String message, NotificationType type) {
+      this.notify(message, this.getNotificationPositionByType(type));
+   }
+
+   public void notify(String message, NotificationPosition notificationPosition) {
+      if (notificationPosition == NotificationPosition.DEFAULT) {
+         notificationPosition = Conf.defaultNotificationPosition;
+      }
+
+      if (notificationPosition == NotificationPosition.HIDDEN) {
+         return;
+      }
+
+      if (notificationPosition == NotificationPosition.ACTIONBAR) {
+         this.sendActionBarMessage(message);
+      } else {
+         this.sendMessage(message);
+      }
    }
 
    @Override

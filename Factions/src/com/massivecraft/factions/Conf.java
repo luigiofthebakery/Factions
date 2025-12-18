@@ -5,6 +5,8 @@ import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.massivecraft.factions.struct.NotificationPosition;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -169,6 +171,7 @@ public class Conf {
    public static boolean trustDenyBuild = false;
    public static boolean trustProtectMaterials = false;
    public static boolean trustDenyUseage = false;
+   public static NotificationPosition defaultNotificationPosition = NotificationPosition.CHAT;
    public static boolean pistonProtectionThroughDenyBuild = true;
    public static Set<Material> territoryProtectedMaterials = EnumSet.noneOf(Material.class);
    public static Set<Material> territoryDenyUseageMaterials = EnumSet.noneOf(Material.class);

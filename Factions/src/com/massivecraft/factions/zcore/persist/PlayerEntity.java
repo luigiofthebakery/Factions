@@ -1,6 +1,8 @@
 package com.massivecraft.factions.zcore.persist;
 
 import java.util.List;
+
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -32,6 +34,13 @@ public class PlayerEntity extends Entity {
    public void sendMessage(List<String> msgs) {
       for (String msg : msgs) {
          this.sendMessage(msg);
+      }
+   }
+
+   public void sendActionBarMessage(String msg) {
+      Player player = this.getPlayer();
+      if (player != null) {
+         player.sendActionBar(Component.text(msg));
       }
    }
 }
