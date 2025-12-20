@@ -29,7 +29,6 @@ public class FCmdRoot extends FCommand {
    public CmdMoney cmdMoney = new CmdMoney();
    public CmdOpen cmdOpen = new CmdOpen();
    public CmdOwner cmdOwner = new CmdOwner();
-   public CmdOwnerList cmdOwnerList = new CmdOwnerList();
    public CmdPeaceful cmdPeaceful = new CmdPeaceful();
    public CmdPermanent cmdPermanent = new CmdPermanent();
    public CmdPermanentPower cmdPermanentPower = new CmdPermanentPower();
@@ -88,7 +87,6 @@ public class FCmdRoot extends FCommand {
       this.addSubCommand(this.cmdMoney);
       this.addSubCommand(this.cmdOpen);
       this.addSubCommand(this.cmdOwner);
-      this.addSubCommand(this.cmdOwnerList);
       this.addSubCommand(this.cmdPeaceful);
       this.addSubCommand(this.cmdPermanent);
       this.addSubCommand(this.cmdPermanentPower);

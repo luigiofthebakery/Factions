@@ -12,7 +12,10 @@ import com.massivecraft.factions.struct.*;
 import com.massivecraft.factions.util.RelationUtil;
 import com.massivecraft.factions.zcore.persist.PlayerEntity;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -36,6 +39,7 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator {
    private transient boolean deleteMe;
    private ChatMode chatMode;
    private transient boolean spyingChat;
+   private final Map<String, Object> autoActionMetadata = new ConcurrentHashMap<>();
 
    public Faction getFaction() {
       return this.factionId == null ? null : Factions.i.get(this.factionId);

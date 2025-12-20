@@ -104,7 +104,6 @@ public class CmdHelp extends FCommand {
       pageLines.add(this.p.cmdBase.cmdMap.getUseageTemplate(true));
       pageLines.add(this.p.cmdBase.cmdBoom.getUseageTemplate(true));
       pageLines.add(this.p.cmdBase.cmdOwner.getUseageTemplate(true));
-      pageLines.add(this.p.cmdBase.cmdOwnerList.getUseageTemplate(true));
       pageLines.add(this.p.txt.parse("<i>Claimed land with ownership set is further protected so"));
       pageLines.add(this.p.txt.parse("<i>that only the owner(s), faction admin, and possibly the"));
       pageLines.add(this.p.txt.parse("<i>faction moderators have full access."));
