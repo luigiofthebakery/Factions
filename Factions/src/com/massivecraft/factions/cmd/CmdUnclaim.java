@@ -1,18 +1,19 @@
 package com.massivecraft.factions.cmd;
 
-import com.massivecraft.factions.Board;
-import com.massivecraft.factions.Conf;
-import com.massivecraft.factions.FLocation;
-import com.massivecraft.factions.Faction;
-import com.massivecraft.factions.P;
+import com.massivecraft.factions.*;
 import com.massivecraft.factions.event.LandUnclaimEvent;
 import com.massivecraft.factions.integration.Econ;
 import com.massivecraft.factions.integration.SpoutFeatures;
+import com.massivecraft.factions.struct.AutoTriggerType;
+import com.massivecraft.factions.struct.AutomatableCommand;
 import com.massivecraft.factions.struct.Permission;
 import com.massivecraft.factions.struct.Role;
 import org.bukkit.Bukkit;
 
-public class CmdUnclaim extends FCommand {
+import java.util.Arrays;
+import java.util.List;
+
+public class CmdUnclaim extends AutomatableCommand {
    public CmdUnclaim() {
       this.aliases.add("unclaim");
       this.aliases.add("declaim");
@@ -22,11 +23,24 @@ public class CmdUnclaim extends FCommand {
       this.senderMustBeMember = false;
       this.senderMustBeModerator = false;
       this.senderMustBeAdmin = false;
+
+      this.priority = 100;
+      this.autoPermission = Permission.UNCLAIM_AUTO.node;
+      this.autoMinRoleRequired = Role.ADMIN; // TODO: move to config
+      this.autoTriggerType = AutoTriggerType.CHUNK_BOUNDARY;
+      this.incompatibleWith = Arrays.asList(
+         CmdClaim.class,
+         CmdOwner.class,
+         CmdOwnerAdd.class,
+         CmdOwnerRemove.class,
+         CmdOwnerList.class,
+         CmdOwnerClear.class
+      );
    }
 
    @Override
    public void perform() {
-      FLocation flocation = new FLocation(this.fme);
+      FLocation flocation = this.fme.getLastStoodAt();
       Faction otherFaction = Board.getFactionAt(flocation);
       if (otherFaction.isSafeZone()) {
          if (Permission.MANAGE_SAFE_ZONE.has(this.sender)) {
@@ -97,5 +111,29 @@ public class CmdUnclaim extends FCommand {
             }
          }
       }
+   }
+
+   @Override
+   public boolean onAutoEnable(FPlayer player) {
+      msg("<i>Auto-unclaim enabled.");
+      return true;
+   }
+
+   @Override
+   public boolean onAutoDisable(FPlayer player) {
+      msg("<i>Auto-unclaim disabled.");
+      return true;
+   }
+
+   @Override
+   public boolean doArgsMatch(List<String> args1, List<String> args2) {
+      return true;
+   }
+
+   public boolean canAutoEnable(FPlayer player, List<String> args) {
+      this.args = args;
+      final Faction forFaction = this.argAsFaction(0, this.myFaction);
+
+      return player.canUnclaimForFaction(forFaction);
    }
 }

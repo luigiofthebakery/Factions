@@ -9,13 +9,12 @@ import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.Factions;
 import com.massivecraft.factions.P;
 import com.massivecraft.factions.integration.SpoutFeatures;
-import com.massivecraft.factions.struct.Permission;
-import com.massivecraft.factions.struct.Relation;
-import com.massivecraft.factions.struct.Role;
+import com.massivecraft.factions.struct.*;
 import com.massivecraft.factions.zcore.util.TextUtil;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -124,21 +123,13 @@ public class FactionsPlayerListener implements Listener {
                   }
                }
 
-               if (me.getAutoClaimFor() != null) {
-                  me.attemptClaim(me.getAutoClaimFor(), event.getTo(), true);
-               } else if (me.isAutoSafeClaimEnabled()) {
-                  if (!Permission.MANAGE_SAFE_ZONE.has(player)) {
-                     me.setIsAutoSafeClaimEnabled(false);
-                  } else if (!Board.getFactionAt(to).isSafeZone()) {
-                     Board.setFactionAt(Factions.i.getSafeZone(), to);
-                     me.msg("<i>This land is now a safe zone.");
-                  }
-               } else if (me.isAutoWarClaimEnabled()) {
-                  if (!Permission.MANAGE_WAR_ZONE.has(player)) {
-                     me.setIsAutoWarClaimEnabled(false);
-                  } else if (!Board.getFactionAt(to).isWarZone()) {
-                     Board.setFactionAt(Factions.i.getWarZone(), to);
-                     me.msg("<i>This land is now a war zone.");
+               List<AutoActionDetails> actionsSorted = me.getAutoActions().stream()
+                  .sorted(Comparator.comparingInt(AutoActionDetails::getPriority).reversed())
+                  .collect(Collectors.toList());
+
+               for (AutoActionDetails action : actionsSorted) {
+                  if (action.getTriggerType() == AutoTriggerType.CHUNK_BOUNDARY) {
+                     action.doAction();
                   }
                }
             }

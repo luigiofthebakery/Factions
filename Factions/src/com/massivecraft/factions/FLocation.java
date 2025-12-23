@@ -14,6 +14,7 @@ public class FLocation {
    private String worldName = "world";
    private int x = 0;
    private int z = 0;
+   private transient Location location;
 
    public FLocation() {
    }
@@ -26,6 +27,7 @@ public class FLocation {
 
    public FLocation(Location location) {
       this(location.getWorld().getName(), blockToChunk(location.getBlockX()), blockToChunk(location.getBlockZ()));
+      this.location = location;
    }
 
    public FLocation(Player player) {
@@ -66,6 +68,10 @@ public class FLocation {
 
    public void setZ(int z) {
       this.z = z;
+   }
+
+   public Location getLocation() {
+      return this.location;
    }
 
    public String getCoordString() {

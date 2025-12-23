@@ -50,6 +50,7 @@ public class FCmdRoot extends FCommand {
    public CmdWarunclaimall cmdWarunclaimall = new CmdWarunclaimall();
    public CmdTrust cmdTrust = new CmdTrust();
    public CmdUntrust cmdUntrust = new CmdUntrust();
+   public CmdAuto cmdAuto = new CmdAuto();
 
    public FCmdRoot() {
       this.aliases.addAll(Conf.baseCommandAliases);
@@ -108,6 +109,11 @@ public class FCmdRoot extends FCommand {
       this.addSubCommand(this.cmdWarunclaimall);
       this.addSubCommand(this.cmdTrust);
       this.addSubCommand(this.cmdUntrust);
+      this.addSubCommand(this.cmdAuto);
+
+      cmdAuto.registerAction(this.cmdClaim);
+      cmdAuto.registerAction(this.cmdUnclaim);
+      cmdAuto.registerAction(this.cmdOwner);
    }
 
    @Override

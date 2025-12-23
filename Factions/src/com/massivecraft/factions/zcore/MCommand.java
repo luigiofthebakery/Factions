@@ -94,6 +94,30 @@ public abstract class MCommand<T extends MPlugin> {
       this.execute(sender, args, new ArrayList<>());
    }
 
+   public void prepare(CommandSender sender, List<String> args, List<MCommand<?>> commandChain) {
+      this.sender = sender;
+      if (sender instanceof Player) {
+         this.me = (Player)sender;
+         this.senderIsConsole = false;
+      } else {
+         this.me = null;
+         this.senderIsConsole = true;
+      }
+
+      this.args = args;
+      this.commandChain = commandChain;
+      if (args.size() > 0) {
+         for (MCommand<?> subCommand : this.subCommands) {
+            if (subCommand.aliases.contains(args.get(0))) {
+               args.remove(0);
+               commandChain.add(this);
+               subCommand.prepare(sender, args, commandChain);
+               return;
+            }
+         }
+      }
+   }
+
    public abstract void perform();
 
    public boolean validCall(CommandSender sender, List<String> args) {

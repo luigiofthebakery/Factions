@@ -1,15 +1,15 @@
 package com.massivecraft.factions.cmd;
 
-import com.massivecraft.factions.Board;
-import com.massivecraft.factions.Conf;
-import com.massivecraft.factions.FLocation;
-import com.massivecraft.factions.Faction;
+import com.massivecraft.factions.*;
+import com.massivecraft.factions.struct.AutoTriggerType;
+import com.massivecraft.factions.struct.AutomatableCommand;
 import com.massivecraft.factions.struct.Permission;
+import com.massivecraft.factions.struct.Role;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class CmdOwnerList extends FCommand {
+public class CmdOwnerList extends AutomatableCommand {
    public CmdOwnerList() {
       this.aliases.add("list");
       this.permission = Permission.OWNER_LIST.node;
@@ -18,6 +18,15 @@ public class CmdOwnerList extends FCommand {
       this.senderMustBeMember = false;
       this.senderMustBeModerator = false;
       this.senderMustBeAdmin = false;
+
+      this.priority = 80;
+      this.autoPermission = Permission.OWNER_LIST_AUTO.node;
+      this.autoMinRoleRequired = Role.NORMAL;
+      this.autoTriggerType = AutoTriggerType.CHUNK_BOUNDARY;
+      this.incompatibleWith = Arrays.asList(
+         CmdUnclaim.class,
+         CmdOwnerClear.class
+      );
    }
 
    @Override
@@ -27,7 +36,7 @@ public class CmdOwnerList extends FCommand {
          if (!Conf.ownedAreasEnabled) {
             this.fme.msg("<b>Sorry, but owned areas are disabled on this server.");
          } else {
-            FLocation flocation = new FLocation(this.fme);
+            FLocation flocation = this.fme.getLastStoodAt();
             Faction factionHere = Board.getFactionAt(flocation);
             if (factionHere != this.myFaction) {
                if (!hasBypass) {
@@ -49,5 +58,33 @@ public class CmdOwnerList extends FCommand {
             }
          }
       }
+   }
+
+   @Override
+   public boolean onAutoEnable(FPlayer player) {
+      boolean preCheck = super.onAutoEnable(player);
+
+      if (!preCheck) {
+         return false;
+      }
+
+      if (!Conf.ownedAreasEnabled) {
+         this.fme.msg("<b>Sorry, but owned areas are disabled on this server.");
+         return false;
+      }
+
+      player.msg("<i>Automatically listing owners.");
+      return true;
+   }
+
+   @Override
+   public boolean onAutoDisable(FPlayer player) {
+      player.msg("<i>No longer automatically listing owners.");
+      return true;
+   }
+
+   @Override
+   public boolean doArgsMatch(List<String> args1, List<String> args2) {
+      return true;
    }
 }

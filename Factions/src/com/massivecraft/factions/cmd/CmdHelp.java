@@ -3,8 +3,10 @@ package com.massivecraft.factions.cmd;
 import com.massivecraft.factions.Conf;
 import com.massivecraft.factions.P;
 import com.massivecraft.factions.integration.Econ;
+import com.massivecraft.factions.struct.AutomatableCommand;
 import com.massivecraft.factions.struct.Permission;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class CmdHelp extends FCommand {
    public ArrayList<ArrayList<String>> helpPages;
@@ -99,6 +101,16 @@ public class CmdHelp extends FCommand {
          pageLines.add( p.cmdBase.cmdUntrust.getUseageTemplate(true) );
          this.helpPages.add(pageLines);
       }
+
+      pageLines = new ArrayList<>();
+      pageLines.add( p.txt.parse("<i>The new automatic system allows you to use commands"));
+      pageLines.add( p.txt.parse("<i>automatically when moving between chunks:"));
+      pageLines.add( p.cmdBase.cmdAuto.getUseageTemplate(true) );
+      pageLines.add( p.txt.parse("<i>Supported commands:"));
+      for (AutomatableCommand action : p.cmdBase.cmdAuto.actions) {
+         pageLines.add( action.getUseageTemplate(Arrays.asList(p.cmdBase, p.cmdBase.cmdAuto), false));
+      }
+      this.helpPages.add(pageLines);
 
       pageLines = new ArrayList<>();
       pageLines.add(this.p.cmdBase.cmdMap.getUseageTemplate(true));

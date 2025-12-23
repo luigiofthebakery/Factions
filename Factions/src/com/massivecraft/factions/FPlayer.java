@@ -12,7 +12,7 @@ import com.massivecraft.factions.struct.*;
 import com.massivecraft.factions.util.RelationUtil;
 import com.massivecraft.factions.zcore.persist.PlayerEntity;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,15 +31,12 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator {
    private long lastPowerUpdateTime;
    private long lastLoginTime;
    private transient boolean mapAutoUpdating;
-   private transient Faction autoClaimFor;
-   private transient boolean autoSafeZoneEnabled;
-   private transient boolean autoWarZoneEnabled;
    private transient boolean isAdminBypassing = false;
    private transient boolean loginPvpDisabled;
    private transient boolean deleteMe;
    private ChatMode chatMode;
    private transient boolean spyingChat;
-   private final Map<String, Object> autoActionMetadata = new ConcurrentHashMap<>();
+   private final transient Set<AutoActionDetails> autoActions = ConcurrentHashMap.newKeySet();
 
    public Faction getFaction() {
       return this.factionId == null ? null : Factions.i.get(this.factionId);
@@ -81,42 +78,6 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator {
       this.powerBoost = powerBoost;
    }
 
-   public Faction getAutoClaimFor() {
-      return this.autoClaimFor;
-   }
-
-   public void setAutoClaimFor(Faction faction) {
-      this.autoClaimFor = faction;
-      if (this.autoClaimFor != null) {
-         this.autoSafeZoneEnabled = false;
-         this.autoWarZoneEnabled = false;
-      }
-   }
-
-   public boolean isAutoSafeClaimEnabled() {
-      return this.autoSafeZoneEnabled;
-   }
-
-   public void setIsAutoSafeClaimEnabled(boolean enabled) {
-      this.autoSafeZoneEnabled = enabled;
-      if (enabled) {
-         this.autoClaimFor = null;
-         this.autoWarZoneEnabled = false;
-      }
-   }
-
-   public boolean isAutoWarClaimEnabled() {
-      return this.autoWarZoneEnabled;
-   }
-
-   public void setIsAutoWarClaimEnabled(boolean enabled) {
-      this.autoWarZoneEnabled = enabled;
-      if (enabled) {
-         this.autoClaimFor = null;
-         this.autoSafeZoneEnabled = false;
-      }
-   }
-
    public boolean isAdminBypassing() {
       return this.isAdminBypassing;
    }
@@ -156,9 +117,6 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator {
       this.lastPowerUpdateTime = System.currentTimeMillis();
       this.lastLoginTime = System.currentTimeMillis();
       this.mapAutoUpdating = false;
-      this.autoClaimFor = null;
-      this.autoSafeZoneEnabled = false;
-      this.autoWarZoneEnabled = false;
       this.loginPvpDisabled = Conf.noPVPDamageToOthersForXSecondsAfterLogin > 0;
       this.deleteMe = false;
       this.powerBoost = 0.0;
@@ -180,7 +138,6 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator {
       this.chatMode = ChatMode.PUBLIC;
       this.role = Role.NORMAL;
       this.title = "";
-      this.autoClaimFor = null;
       if (doSpoutUpdate) {
          SpoutFeatures.updateAppearances(this.getPlayer());
       }
@@ -480,20 +437,23 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator {
    public boolean canClaimForFaction(Faction forFaction) {
       return !forFaction.isNone()
          && (
-            this.isAdminBypassing()
-               || forFaction == this.getFaction() && this.getRole().isAtLeast(Role.MODERATOR)
-               || forFaction.isSafeZone() && Permission.MANAGE_SAFE_ZONE.has(this.getPlayer())
-               || forFaction.isWarZone() && Permission.MANAGE_WAR_ZONE.has(this.getPlayer())
-         );
+         this.isAdminBypassing()
+            || forFaction == this.getFaction() && this.getRole().isAtLeast(Role.MODERATOR)
+            || forFaction.isSafeZone() && Permission.MANAGE_SAFE_ZONE.has(this.getPlayer())
+            || forFaction.isWarZone() && Permission.MANAGE_WAR_ZONE.has(this.getPlayer())
+      );
    }
 
    public boolean canClaimForFactionAtLocation(Faction forFaction, Location location, boolean notifyFailure) {
+      return this.canClaimForFactionAtLocation(forFaction, new FLocation(location), notifyFailure);
+   }
+
+   public boolean canClaimForFactionAtLocation(Faction forFaction, FLocation flocation, boolean notifyFailure) {
       String error = null;
-      FLocation flocation = new FLocation(location);
       Faction myFaction = this.getFaction();
       Faction currentFaction = Board.getFactionAt(flocation);
       int ownedLand = forFaction.getLandRounded();
-      if (Conf.worldGuardChecking && Worldguard.checkForRegionsInChunk(location)) {
+      if (Conf.worldGuardChecking && Worldguard.checkForRegionsInChunk(flocation.getLocation())) {
          error = P.p.txt.parse("<b>This land is protected");
       } else if (Conf.worldsNoClaiming.contains(flocation.getWorldName())) {
          error = P.p.txt.parse("<b>Sorry, this world has land claiming disabled.");
@@ -560,11 +520,24 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator {
       return error == null;
    }
 
+   public boolean canUnclaimForFaction(Faction forFaction) {
+      return !forFaction.isNone()
+         && (
+         this.isAdminBypassing()
+            || forFaction == this.getFaction() && this.getRole().isAtLeast(Role.MODERATOR)
+            || forFaction.isSafeZone() && Permission.MANAGE_SAFE_ZONE.has(this.getPlayer())
+            || forFaction.isWarZone() && Permission.MANAGE_WAR_ZONE.has(this.getPlayer())
+      );
+   }
+
    public boolean attemptClaim(Faction forFaction, Location location, boolean notifyFailure) {
-      FLocation flocation = new FLocation(location);
+      return this.attemptClaim(forFaction, new FLocation(location), notifyFailure);
+   }
+
+   public boolean attemptClaim(Faction forFaction, FLocation flocation, boolean notifyFailure) {
       Faction currentFaction = Board.getFactionAt(flocation);
       int ownedLand = forFaction.getLandRounded();
-      if (!this.canClaimForFactionAtLocation(forFaction, location, notifyFailure)) {
+      if (!this.canClaimForFactionAtLocation(forFaction, flocation, notifyFailure)) {
          return false;
       } else {
          boolean mustPay = Econ.shouldBeUsed() && !this.isAdminBypassing() && !forFaction.isSafeZone() && !forFaction.isWarZone();
@@ -619,6 +592,81 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator {
 
             return true;
          }
+      }
+   }
+
+   public Set<AutoActionDetails> getAutoActions() {
+      return this.autoActions;
+   }
+
+   public AutoActionDetails getAutoActionFor(Class<?> commandType) {
+      for (AutoActionDetails action : this.autoActions) {
+         if (action.getCommand().getClass().equals(commandType)) {
+            return action;
+         }
+      }
+
+      return null;
+   }
+
+   public AutoActionDetails getAutoActionFor(AutomatableCommand command) {
+      for (AutoActionDetails action : this.autoActions) {
+         if (action.getCommand().equals(command)) {
+            return action;
+         }
+      }
+
+      return null;
+   }
+
+   public boolean hasAutoActionFor(AutomatableCommand command) {
+      return autoActions.stream().anyMatch((det) -> det.getCommand().getClass().equals(command.getClass()));
+   }
+
+   public void toggleAutoAction(AutoActionDetails details) {
+      if (!hasAutoActionFor(details.getCommand())) {
+         this.addAutoAction(details);
+      } else {
+         this.removeAutoAction(details);
+      }
+   }
+
+   public void addAutoAction(AutoActionDetails details) {
+      boolean success = details.onEnable();
+      if (success) {
+         details.doAction();
+         this.autoActions.add(details);
+      }
+   }
+
+   public void removeAutoAction(AutomatableCommand command) {
+      AutoActionDetails action = this.getAutoActionFor(command);
+      if (action != null) {
+         action.onDisable();
+         this.autoActions.remove(action);
+      }
+   }
+
+   public void removeAutoAction(AutoActionDetails details) {
+      AutoActionDetails action = this.getAutoActionFor(details.getCommand());
+      if (action != null) {
+         action.onDisable();
+         this.autoActions.remove(action);
+      }
+   }
+
+   public void removeAutoActions(List<Class<?>> commands) {
+      for (Class<?> commandClass : commands) {
+         AutoActionDetails action = this.getAutoActionFor(commandClass);
+         if (action != null) {
+            this.removeAutoAction(action);
+         }
+      }
+   }
+
+   public void removeAllAutoActions() {
+      for (AutoActionDetails action : this.autoActions) {
+         this.autoActions.remove(action);
       }
    }
 
