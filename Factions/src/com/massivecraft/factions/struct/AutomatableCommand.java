@@ -31,7 +31,6 @@ public abstract class AutomatableCommand extends FCommand {
    }
 
    public boolean onAutoEnable(FPlayer player) {
-      player.sendMessage(args);
       boolean hasPermission = P.p.perm.has(player.getPlayer(), autoPermission);
 
       if (!hasPermission) {
