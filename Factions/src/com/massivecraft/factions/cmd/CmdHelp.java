@@ -5,6 +5,8 @@ import com.massivecraft.factions.P;
 import com.massivecraft.factions.integration.Econ;
 import com.massivecraft.factions.struct.AutomatableCommand;
 import com.massivecraft.factions.struct.Permission;
+import com.massivecraft.factions.zcore.MCommand;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -113,12 +115,18 @@ public class CmdHelp extends FCommand {
       this.helpPages.add(pageLines);
 
       pageLines = new ArrayList<>();
-      pageLines.add(this.p.cmdBase.cmdMap.getUseageTemplate(true));
-      pageLines.add(this.p.cmdBase.cmdBoom.getUseageTemplate(true));
       pageLines.add(this.p.cmdBase.cmdOwner.getUseageTemplate(true));
       pageLines.add(this.p.txt.parse("<i>Claimed land with ownership set is further protected so"));
       pageLines.add(this.p.txt.parse("<i>that only the owner(s), faction admin, and possibly the"));
       pageLines.add(this.p.txt.parse("<i>faction moderators have full access."));
+      for (MCommand<?> subcommand : p.cmdBase.cmdOwner.subCommands) {
+         pageLines.add( subcommand.getUseageTemplate(Arrays.asList(p.cmdBase, p.cmdBase.cmdOwner), true));
+      }
+      this.helpPages.add(pageLines);
+
+      pageLines = new ArrayList<>();
+      pageLines.add(this.p.cmdBase.cmdMap.getUseageTemplate(true));
+      pageLines.add(this.p.cmdBase.cmdBoom.getUseageTemplate(true));
       this.helpPages.add(pageLines);
 
       pageLines = new ArrayList<>();
