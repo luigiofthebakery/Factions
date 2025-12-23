@@ -106,7 +106,7 @@ public class CmdHelp extends FCommand {
 
       pageLines = new ArrayList<>();
       pageLines.add( p.txt.parse("<i>The new automatic system allows you to use commands"));
-      pageLines.add( p.txt.parse("<i>automatically when moving between chunks:"));
+      pageLines.add( p.txt.parse("<i>automatically when moving between chunks."));
       pageLines.add( p.cmdBase.cmdAuto.getUseageTemplate(true) );
       pageLines.add( p.txt.parse("<i>Supported commands:"));
       for (AutomatableCommand action : p.cmdBase.cmdAuto.actions) {
