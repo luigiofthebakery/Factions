@@ -33,16 +33,16 @@ public class CmdJoin extends FCommand {
          } else if (!faction.isNormal()) {
             this.msg("<b>Players may only join normal factions. This is a system faction.", new Object[0]);
          } else if (faction == fplayer.getFaction()) {
-            this.msg("<b>%s %s already a member of %s", new Object[]{fplayer.describeTo(this.fme, true), samePlayer ? "are" : "is", faction.getTag(this.fme)});
+            this.msg("%s<b> %s already a member of %s<b>.", new Object[]{fplayer.describeTo(this.fme, true), samePlayer ? "are" : "is", faction.getTag(this.fme)});
          } else if (Conf.factionMemberLimit > 0 && faction.getFPlayers().size() >= Conf.factionMemberLimit) {
             this.msg(
-               " <b>!<white> The faction %s is at the limit of %d members, so %s cannot currently join.",
+               " <b>!<white> The faction %s<white> is at the limit of %d<white> members, so %s<white> cannot currently join.",
                new Object[]{faction.getTag(this.fme), Conf.factionMemberLimit, fplayer.describeTo(this.fme, false)}
             );
          } else if (fplayer.hasFaction()) {
-            this.msg("<b>%s must leave %s current faction first.", new Object[]{fplayer.describeTo(this.fme, true), samePlayer ? "your" : "their"});
+            this.msg("%s<b> must leave %s current faction first.", new Object[]{fplayer.describeTo(this.fme, true), samePlayer ? "your" : "their"});
          } else if (!Conf.canLeaveWithNegativePower && fplayer.getPower() < 0.0) {
-            this.msg("<b>%s cannot join a faction with a negative power level.", new Object[]{fplayer.describeTo(this.fme, true)});
+            this.msg("%s<b> cannot join a faction with a negative power level.", new Object[]{fplayer.describeTo(this.fme, true)});
          } else if (!faction.getOpen() && !faction.isInvited(fplayer) && !this.fme.isAdminBypassing() && !Permission.JOIN_ANY.has(this.sender, false)) {
             this.msg("<i>This faction requires invitation.", new Object[0]);
             if (samePlayer) {
@@ -53,12 +53,12 @@ public class CmdJoin extends FCommand {
             Bukkit.getServer().getPluginManager().callEvent(joinEvent);
             if (!joinEvent.isCancelled()) {
                if (!samePlayer || this.payForCommand(Conf.econCostJoin, "to join a faction", "for joining a faction")) {
-                  this.fme.msg("<i>%s successfully joined %s.", fplayer.describeTo(this.fme, true), faction.getTag(this.fme));
+                  this.fme.msg("%s<i> successfully joined %s<i>.", fplayer.describeTo(this.fme, true), faction.getTag(this.fme));
                   if (!samePlayer) {
-                     fplayer.msg("<i>%s moved you into the faction %s.", this.fme.describeTo(fplayer, true), faction.getTag(fplayer));
+                     fplayer.msg("%s<i> moved you into the faction %s<i>.", this.fme.describeTo(fplayer, true), faction.getTag(fplayer));
                   }
 
-                  faction.msg("<i>%s joined your faction.", fplayer.describeTo(faction, true));
+                  faction.msg("%s<i> joined your faction.", fplayer.describeTo(faction, true));
                   fplayer.resetFactionData();
                   fplayer.setFaction(faction);
                   faction.deinvite(fplayer);
