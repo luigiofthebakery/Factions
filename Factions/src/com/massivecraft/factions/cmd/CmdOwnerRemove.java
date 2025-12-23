@@ -23,7 +23,6 @@ public class CmdOwnerRemove extends AutomatableCommand {
 
       this.priority = 90;
       this.autoPermission = Permission.OWNER_REMOVE_AUTO.node;
-      this.autoMinRoleRequired = Role.ADMIN; // TODO: move to config
       this.autoTriggerType = AutoTriggerType.CHUNK_BOUNDARY;
       this.incompatibleWith = Arrays.asList(
          CmdUnclaim.class,
@@ -38,7 +37,7 @@ public class CmdOwnerRemove extends AutomatableCommand {
       if (hasBypass || this.assertHasFaction()) {
          if (!Conf.ownedAreasEnabled) {
             this.fme.msg("<b>Sorry, but owned areas are disabled on this server.");
-         } else if (hasBypass || this.assertMinRole(Conf.ownedAreasModeratorsCanSet ? Role.MODERATOR : Role.ADMIN)) {
+         } else if (hasBypass || this.assertMinRole(Conf.ownerRemoveMinRole)) {
             FLocation flocation = this.fme.getLastStoodAt();
             Faction factionHere = Board.getFactionAt(flocation);
             if (factionHere != this.myFaction) {
@@ -78,25 +77,27 @@ public class CmdOwnerRemove extends AutomatableCommand {
          return false;
       }
 
-      boolean hasBypass = this.fme.isAdminBypassing();
+      boolean hasBypass = player.isAdminBypassing();
 
       if (!Conf.ownedAreasEnabled) {
-         this.fme.msg("<b>Sorry, but owned areas are disabled on this server.");
+         player.msg("<b>Sorry, but owned areas are disabled on this server.");
+         return false;
+      } else if (!hasBypass && (!this.assertHasFaction() || !this.assertMinRole(Conf.autoOwnerRemoveMinRole))) {
          return false;
       } else if (!hasBypass && Conf.ownedAreasLimitPerFaction > 0 && this.myFaction.getCountOfClaimsWithOwners() >= Conf.ownedAreasLimitPerFaction) {
-         this.fme.msg("<b>Sorry, but you have reached the server's <h>limit of %d <b>owned areas per faction.", Conf.ownedAreasLimitPerFaction);
+         player.msg("<b>Sorry, but you have reached the server's <h>limit of %d <b>owned areas per faction.", Conf.ownedAreasLimitPerFaction);
          return false;
       }
 
-      FPlayer target = this.argAsBestFPlayerMatch(0, fme);
-      player.msg("<i>Automatically trying to remove %s<i> from ownerlist.", target.describeTo(fme));
+      FPlayer target = this.argAsBestFPlayerMatch(0, player);
+      player.msg("<i>Automatically trying to remove %s<i> from ownerlist.", target.describeTo(player));
       return true;
    }
 
    @Override
    public boolean onAutoDisable(FPlayer player) {
-      FPlayer target = this.argAsBestFPlayerMatch(0, fme);
-      player.msg("<i>No longer automatically trying to remove %s<i> from ownerlist.", target.describeTo(fme));
+      FPlayer target = this.argAsBestFPlayerMatch(0, player);
+      player.msg("<i>No longer automatically trying to remove %s<i> from ownerlist.", target.describeTo(player));
       return true;
    }
 

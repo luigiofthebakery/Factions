@@ -21,7 +21,6 @@ public class CmdOwnerList extends AutomatableCommand {
 
       this.priority = 80;
       this.autoPermission = Permission.OWNER_LIST_AUTO.node;
-      this.autoMinRoleRequired = Role.NORMAL;
       this.autoTriggerType = AutoTriggerType.CHUNK_BOUNDARY;
       this.incompatibleWith = Arrays.asList(
          CmdUnclaim.class,
@@ -32,7 +31,7 @@ public class CmdOwnerList extends AutomatableCommand {
    @Override
    public void perform() {
       boolean hasBypass = this.fme.isAdminBypassing();
-      if (hasBypass || this.assertHasFaction()) {
+      if (hasBypass || (this.assertHasFaction() && this.assertMinRole(Conf.ownerListMinRole))) {
          if (!Conf.ownedAreasEnabled) {
             this.fme.msg("<b>Sorry, but owned areas are disabled on this server.");
          } else {
@@ -69,7 +68,11 @@ public class CmdOwnerList extends AutomatableCommand {
       }
 
       if (!Conf.ownedAreasEnabled) {
-         this.fme.msg("<b>Sorry, but owned areas are disabled on this server.");
+         player.msg("<b>Sorry, but owned areas are disabled on this server.");
+         return false;
+      }
+
+      if (!player.isAdminBypassing() && (!this.assertHasFaction() || !this.assertMinRole(Conf.autoOwnerListMinRole))) {
          return false;
       }
 

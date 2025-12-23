@@ -100,7 +100,7 @@ public abstract class FCommand extends MCommand<P> {
       if (this.me == null) {
          return true;
       } else if (!this.fme.hasFaction()) {
-         this.sendMessage("You are not member of any faction.");
+         this.msg("<b>You are not member of any faction.");
          return false;
       } else {
          return true;

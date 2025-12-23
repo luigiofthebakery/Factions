@@ -3,11 +3,13 @@ package com.massivecraft.factions.cmd;
 import com.massivecraft.factions.Conf;
 import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.Faction;
+import com.massivecraft.factions.P;
 import com.massivecraft.factions.struct.AutomatableCommand;
 import com.massivecraft.factions.struct.AutoTriggerType;
 import com.massivecraft.factions.struct.Permission;
 import com.massivecraft.factions.struct.Role;
 import com.massivecraft.factions.util.SpiralTask;
+import com.massivecraft.factions.zcore.util.PermUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +28,6 @@ public class CmdClaim extends AutomatableCommand {
 
       this.priority = 100;
       this.autoPermission = Permission.CLAIM_AUTO.node;
-      this.autoMinRoleRequired = Role.MODERATOR; // TODO: move to config
       this.autoTriggerType = AutoTriggerType.CHUNK_BOUNDARY;
       this.incompatibleWith = Collections.singletonList(
          CmdUnclaim.class
@@ -39,11 +40,9 @@ public class CmdClaim extends AutomatableCommand {
       int radius = this.argAsInt(1, 1);
       if (radius < 1) {
          this.msg("<b>If you specify a radius, it must be at least 1.", new Object[0]);
-      } else {
-         if (radius < 2) {
-            this.fme.attemptClaim(forFaction, this.fme.getLastStoodAt(), true);
-         }
-
+      } else if (radius < 2) {
+         this.fme.attemptClaim(forFaction, this.fme.getLastStoodAt(), true);
+      } else if (assertMinRole(Conf.claimRadiusMinRole)) {
          if (radius < 8) {
             new SpiralTask(this.fme.getLastStoodAt(), radius) {
                private int failCount = 0;
@@ -73,6 +72,10 @@ public class CmdClaim extends AutomatableCommand {
       boolean preCheck = super.onAutoEnable(player);
 
       if (!preCheck) {
+         return false;
+      }
+
+      if (!fme.isAdminBypassing() && (!this.assertHasFaction() || !this.assertMinRole(Conf.autoClaimMinRole))) {
          return false;
       }
 

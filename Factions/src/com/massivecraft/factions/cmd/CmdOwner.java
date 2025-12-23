@@ -40,7 +40,6 @@ public class CmdOwner extends AutomatableCommand {
       this.subCommands.add(this.cmdOwnerClear);
 
       this.autoPermission = Permission.OWNER_AUTO.node;
-      this.autoMinRoleRequired = Role.ADMIN; // TODO: move to config
       this.autoTriggerType = AutoTriggerType.CHUNK_BOUNDARY;
       this.incompatibleWith = new ArrayList<>();
    }
@@ -49,6 +48,12 @@ public class CmdOwner extends AutomatableCommand {
    public void perform() {
       if (!Conf.ownedAreasEnabled) {
          this.fme.msg("<b>Sorry, but owned areas are disabled on this server.");
+         return;
+      }
+
+      if (args.isEmpty()) {
+         this.fme.msg("<b>To few arguments. <i>Use like this:");
+         sender.sendMessage(this.getUseageTemplate());
          return;
       }
 
@@ -67,6 +72,10 @@ public class CmdOwner extends AutomatableCommand {
 
       if (!Conf.ownedAreasEnabled) {
          this.fme.msg("<b>Sorry, but owned areas are disabled on this server.");
+         return false;
+      }
+
+      if (!fme.isAdminBypassing() && !this.assertHasFaction()) {
          return false;
       }
 

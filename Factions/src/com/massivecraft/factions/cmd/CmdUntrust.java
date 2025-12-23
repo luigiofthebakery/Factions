@@ -17,9 +17,9 @@ public class CmdUntrust extends FCommand {
       this.disableOnLock = true;
 
       senderMustBePlayer = true;
-      senderMustBeMember = true;
-      senderMustBeModerator = !Conf.trustRequireAdmin;
-      senderMustBeAdmin = Conf.trustRequireAdmin;
+      senderMustBeMember = false;
+      senderMustBeModerator = false;
+      senderMustBeAdmin = false;
    }
 
    @Override
@@ -31,7 +31,11 @@ public class CmdUntrust extends FCommand {
 
       boolean hasBypass = fme.isAdminBypassing();
 
-      if ( ! hasBypass && ! assertHasFaction()) {
+      if (!assertHasFaction()) {
+         return;
+      }
+
+      if (!hasBypass && !assertMinRole(Conf.untrustMinRole)) {
          return;
       }
 

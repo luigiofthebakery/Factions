@@ -15,7 +15,6 @@ public abstract class AutomatableCommand extends FCommand {
    protected AutoTriggerType autoTriggerType;
    protected List<Class<?>> incompatibleWith;
    protected String autoPermission;
-   protected Role autoMinRoleRequired = Role.NORMAL;
    protected int priority = 0;
 
    public AutoTriggerType getTriggerType() {
@@ -38,9 +37,7 @@ public abstract class AutomatableCommand extends FCommand {
          return false;
       }
 
-      if (player.isAdminBypassing()) return true;
-
-      return assertMinRole(autoMinRoleRequired);
+      return true;
    }
 
    public abstract boolean onAutoDisable(FPlayer player);

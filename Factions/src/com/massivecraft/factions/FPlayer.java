@@ -438,7 +438,7 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator {
       return !forFaction.isNone()
          && (
          this.isAdminBypassing()
-            || forFaction == this.getFaction() && this.getRole().isAtLeast(Role.MODERATOR)
+            || forFaction == this.getFaction() && this.getRole().isAtLeast(Conf.claimMinRole)
             || forFaction.isSafeZone() && Permission.MANAGE_SAFE_ZONE.has(this.getPlayer())
             || forFaction.isWarZone() && Permission.MANAGE_WAR_ZONE.has(this.getPlayer())
       );
@@ -474,8 +474,8 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator {
             error = P.p.txt.parse("<b>You can't claim land for <h>%s<b>.", forFaction.describeTo(this));
          } else if (forFaction == currentFaction) {
             error = P.p.txt.parse("%s<i> already own this land.", forFaction.describeTo(this, true));
-         } else if (this.getRole().value < Role.MODERATOR.value) {
-            error = P.p.txt.parse("<b>You must be <h>%s<b> to claim land.", Role.MODERATOR.toString());
+         } else if (this.getRole().value < Conf.claimMinRole.value) {
+            error = P.p.txt.parse("<b>You must be <h>%s<b> to claim land.", Conf.claimMinRole.toString());
          } else if (forFaction.getFPlayers().size() < Conf.claimsRequireMinFactionMembers) {
             error = P.p.txt.parse("Factions must have at least <h>%s<b> members to claim land.", Conf.claimsRequireMinFactionMembers);
          } else if (currentFaction.isSafeZone()) {
@@ -524,7 +524,7 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator {
       return !forFaction.isNone()
          && (
          this.isAdminBypassing()
-            || forFaction == this.getFaction() && this.getRole().isAtLeast(Role.MODERATOR)
+            || forFaction == this.getFaction() && this.getRole().isAtLeast(Conf.unclaimMinRole)
             || forFaction.isSafeZone() && Permission.MANAGE_SAFE_ZONE.has(this.getPlayer())
             || forFaction.isWarZone() && Permission.MANAGE_WAR_ZONE.has(this.getPlayer())
       );

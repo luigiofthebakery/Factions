@@ -23,7 +23,6 @@ public class CmdOwnerClear extends AutomatableCommand {
 
       this.priority = 90;
       this.autoPermission = Permission.OWNER_CLEAR_AUTO.node;
-      this.autoMinRoleRequired = Role.ADMIN; // TODO: move to config
       this.autoTriggerType = AutoTriggerType.CHUNK_BOUNDARY;
       this.incompatibleWith = Arrays.asList(
          CmdUnclaim.class,
@@ -38,7 +37,7 @@ public class CmdOwnerClear extends AutomatableCommand {
       if (hasBypass || this.assertHasFaction()) {
          if (!Conf.ownedAreasEnabled) {
             this.fme.msg("<b>Sorry, but owned areas are disabled on this server.");
-         } else if (hasBypass || this.assertMinRole(Conf.ownedAreasModeratorsCanSet ? Role.MODERATOR : Role.ADMIN)) {
+         } else if (hasBypass || this.assertMinRole(Conf.ownerClearMinRole)) {
             FLocation flocation = this.fme.getLastStoodAt();
             Faction factionHere = Board.getFactionAt(flocation);
             if (factionHere != this.myFaction) {
@@ -73,7 +72,11 @@ public class CmdOwnerClear extends AutomatableCommand {
       }
 
       if (!Conf.ownedAreasEnabled) {
-         this.fme.msg("<b>Sorry, but owned areas are disabled on this server.");
+         player.msg("<b>Sorry, but owned areas are disabled on this server.");
+         return false;
+      }
+
+      if (!player.isAdminBypassing() && (!this.assertHasFaction() || !this.assertMinRole(Conf.autoOwnerClearMinRole))) {
          return false;
       }
 

@@ -26,7 +26,6 @@ public class CmdUnclaim extends AutomatableCommand {
 
       this.priority = 100;
       this.autoPermission = Permission.UNCLAIM_AUTO.node;
-      this.autoMinRoleRequired = Role.ADMIN; // TODO: move to config
       this.autoTriggerType = AutoTriggerType.CHUNK_BOUNDARY;
       this.incompatibleWith = Arrays.asList(
          CmdClaim.class,
@@ -73,7 +72,7 @@ public class CmdUnclaim extends AutomatableCommand {
             P.p.log(this.fme.getName() + " unclaimed land at (" + flocation.getCoordString() + ") from the faction: " + otherFaction.getTag());
          }
       } else if (this.assertHasFaction()) {
-         if (this.assertMinRole(Role.MODERATOR)) {
+         if (this.assertMinRole(Conf.unclaimMinRole)) {
             if (this.myFaction != otherFaction) {
                this.msg("<b>You don't own this land.", new Object[0]);
             } else {
@@ -115,7 +114,17 @@ public class CmdUnclaim extends AutomatableCommand {
 
    @Override
    public boolean onAutoEnable(FPlayer player) {
-      msg("<i>Auto-unclaim enabled.");
+      boolean preCheck = super.onAutoEnable(player);
+
+      if (!preCheck) {
+         return false;
+      }
+
+      if (!player.isAdminBypassing() && (!this.assertHasFaction() || !this.assertMinRole(Conf.autoUnclaimMinRole))) {
+         return false;
+      }
+
+      player.msg("<i>Auto-unclaim enabled.");
       return true;
    }
 
@@ -128,12 +137,5 @@ public class CmdUnclaim extends AutomatableCommand {
    @Override
    public boolean doArgsMatch(List<String> args1, List<String> args2) {
       return true;
-   }
-
-   public boolean canAutoEnable(FPlayer player, List<String> args) {
-      this.args = args;
-      final Faction forFaction = this.argAsFaction(0, this.myFaction);
-
-      return player.canUnclaimForFaction(forFaction);
    }
 }
