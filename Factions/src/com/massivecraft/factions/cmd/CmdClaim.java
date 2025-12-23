@@ -42,7 +42,7 @@ public class CmdClaim extends AutomatableCommand {
          this.msg("<b>If you specify a radius, it must be at least 1.", new Object[0]);
       } else if (radius < 2) {
          this.fme.attemptClaim(forFaction, this.fme.getLastStoodAt(), true);
-      } else if (assertMinRole(Conf.claimRadiusMinRole)) {
+      } else if (this.fme.isAdminBypassing() || assertMinRole(Conf.claimRadiusMinRole)) {
          if (radius < 8) {
             new SpiralTask(this.fme.getLastStoodAt(), radius) {
                private int failCount = 0;
