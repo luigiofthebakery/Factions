@@ -95,6 +95,14 @@ public class RelationUtil {
 
       Relation relation = getRelationTo(that, me);
 
+      if (thisPlayer != null && thisPlayer.equals(thatPlayer)) {
+         if (thisFaction.isNone()) {
+            return Conf.colorNeutral;
+         } else {
+            return Conf.colorMember;
+         }
+      }
+
       if (!relation.equals(Relation.MEMBER)) {
          if (Conf.trustEnabled) {
             boolean isTrustedToFaction = thatPlayer == null && thisPlayer != null && thatFaction != null && thatFaction.trustsPlayer(thisPlayer);
