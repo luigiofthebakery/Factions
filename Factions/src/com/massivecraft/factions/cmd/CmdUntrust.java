@@ -50,14 +50,16 @@ public class CmdUntrust extends FCommand {
             target.describeTo(fme)));
       } else {
          faction.removeTrustedPlayer(target);
-         msg(String.format("%s <i>no longer trusts %s <i>with their land.",
+         faction.msg(String.format("%s <i>no longer trusts %s <i>with their land.",
             faction.describeTo(fme, true),
             target.describeTo(fme)));
-         target.sendMessage(this.p.txt.parse(
-            String.format("%s <i>no longer trusts %s <i>with their land.",
-               faction.describeTo(target, true),
-               target.describeTo(target))
-         ));
+         if (!target.getFaction().equals(faction)) {
+            target.sendMessage(this.p.txt.parse(
+               String.format("%s <i>no longer trusts %s <i>with their land.",
+                  faction.describeTo(target, true),
+                  target.describeTo(target))
+            ));
+         }
       }
    }
 }

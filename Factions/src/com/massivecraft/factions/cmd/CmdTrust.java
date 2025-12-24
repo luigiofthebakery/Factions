@@ -50,14 +50,17 @@ public class CmdTrust extends FCommand {
             target.describeTo(fme)));
       } else {
          faction.addTrustedPlayer(target);
-         msg(String.format("%s <i>now trusts %s <i>with their land.",
+         faction.msg(String.format("%s <i>now trusts %s <i>with their land.",
             faction.describeTo(fme, true),
             target.describeTo(fme)));
-         target.sendMessage(this.p.txt.parse(
-            String.format("%s <i>now trusts %s <i>with their land.",
-               faction.describeTo(target, true),
-               target.describeTo(target))
-         ));
+
+         if (!target.getFaction().equals(faction)) {
+            target.sendMessage(this.p.txt.parse(
+               String.format("%s <i>now trusts %s <i>with their land.",
+                  faction.describeTo(target, true),
+                  target.describeTo(target))
+            ));
+         }
       }
    }
 }
