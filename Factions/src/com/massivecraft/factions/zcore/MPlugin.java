@@ -37,7 +37,7 @@ public abstract class MPlugin extends JavaPlugin {
    protected boolean loadSuccessful = false;
    public String refCommand = "";
    private MPluginSecretPlayerListener mPluginSecretPlayerListener;
-   private MPluginSecretServerListener mPluginSecretServerListener;
+
    private List<MCommand<?>> baseCommands = new ArrayList<>();
    private long timeEnableStart;
    public Map<String, String> rawTags = new LinkedHashMap<>();
@@ -74,9 +74,9 @@ public abstract class MPlugin extends JavaPlugin {
       }
 
       this.mPluginSecretPlayerListener = new MPluginSecretPlayerListener(this);
-      this.mPluginSecretServerListener = new MPluginSecretServerListener(this);
+
       this.getServer().getPluginManager().registerEvents(this.mPluginSecretPlayerListener, this);
-      this.getServer().getPluginManager().registerEvents(this.mPluginSecretServerListener, this);
+
       long saveTicks = 30L;
       if (this.saveTask == null) {
          this.saveTask = Bukkit.getAsyncScheduler().runAtFixedRate(this, new SaveTask(this), saveTicks, saveTicks, TimeUnit.MINUTES);
