@@ -42,6 +42,6 @@ public class CmdMap extends FCommand {
    }
 
    public void showMap() {
-      this.sendMessage(Board.getMap(this.myFaction, new FLocation(this.fme), this.fme.getPlayer().getLocation().getYaw()));
+      this.sendMessage(Board.getMap(this.fme, new FLocation(this.fme), this.fme.getPlayer().getLocation().getYaw()));
    }
 }

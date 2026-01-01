@@ -9,13 +9,12 @@ import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.Factions;
 import com.massivecraft.factions.P;
 import com.massivecraft.factions.integration.SpoutFeatures;
-import com.massivecraft.factions.struct.Permission;
-import com.massivecraft.factions.struct.Relation;
-import com.massivecraft.factions.struct.Role;
+import com.massivecraft.factions.struct.*;
 import com.massivecraft.factions.zcore.util.TextUtil;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -94,7 +93,7 @@ public class FactionsPlayerListener implements Listener {
                }
 
                if (me.isMapAutoUpdating()) {
-                  me.sendMessage(Board.getMap(me.getFaction(), to, player.getLocation().getYaw()));
+                  me.sendMessage(Board.getMap(me, to, player.getLocation().getYaw()));
                   if (spoutClient && Conf.spoutTerritoryOwnersShow) {
                      SpoutFeatures.updateOwnerList(me);
                   }
@@ -124,21 +123,13 @@ public class FactionsPlayerListener implements Listener {
                   }
                }
 
-               if (me.getAutoClaimFor() != null) {
-                  me.attemptClaim(me.getAutoClaimFor(), event.getTo(), true);
-               } else if (me.isAutoSafeClaimEnabled()) {
-                  if (!Permission.MANAGE_SAFE_ZONE.has(player)) {
-                     me.setIsAutoSafeClaimEnabled(false);
-                  } else if (!Board.getFactionAt(to).isSafeZone()) {
-                     Board.setFactionAt(Factions.i.getSafeZone(), to);
-                     me.msg("<i>This land is now a safe zone.");
-                  }
-               } else if (me.isAutoWarClaimEnabled()) {
-                  if (!Permission.MANAGE_WAR_ZONE.has(player)) {
-                     me.setIsAutoWarClaimEnabled(false);
-                  } else if (!Board.getFactionAt(to).isWarZone()) {
-                     Board.setFactionAt(Factions.i.getWarZone(), to);
-                     me.msg("<i>This land is now a war zone.");
+               List<AutoActionDetails> actionsSorted = me.getAutoActions().stream()
+                  .sorted(Comparator.comparingInt(AutoActionDetails::getPriority).reversed())
+                  .collect(Collectors.toList());
+
+               for (AutoActionDetails action : actionsSorted) {
+                  if (action.getTriggerType() == AutoTriggerType.CHUNK_BOUNDARY) {
+                     action.doAction();
                   }
                }
             }
@@ -234,7 +225,8 @@ public class FactionsPlayerListener implements Listener {
             } else {
                Faction myFaction = me.getFaction();
                Relation rel = myFaction.getRelationTo(otherFaction);
-               if (rel.confDenyUseage()) {
+               boolean trusted = Conf.trustEnabled && otherFaction.trustsPlayer(me);
+               if ((!trusted && rel.confDenyUseage()) || (trusted && Conf.trustDenyUseage)) {
                   if (!justCheck) {
                      me.msg("<b>You can't use <h>%s<b> in the territory of <h>%s<b>.", TextUtil.getMaterialName(material), otherFaction.getTag(myFaction));
                   }
@@ -283,7 +275,21 @@ public class FactionsPlayerListener implements Listener {
 
                Faction myFaction = me.getFaction();
                Relation rel = myFaction.getRelationTo(otherFaction);
-               if (rel.isNeutral() || rel.isEnemy() && Conf.territoryEnemyProtectMaterials || rel.isAlly() && Conf.territoryAllyProtectMaterials) {
+               boolean trusted = Conf.trustEnabled && otherFaction.trustsPlayer(me);
+
+               boolean deny = false;
+               if (trusted) {
+                  if (Conf.trustProtectMaterials) {
+                     deny = true;
+                  }
+               }
+               else {
+                  if (rel.isNeutral() || rel.isEnemy() && Conf.territoryEnemyProtectMaterials || rel.isAlly() && Conf.territoryAllyProtectMaterials) {
+                     deny = true;
+                  }
+               }
+
+               if (deny) {
                   if (!justCheck) {
                      me.msg(
                         "<b>You can't %s <h>%s<b> in the territory of <h>%s<b>.",

@@ -29,6 +29,7 @@ public class Faction extends Entity implements EconomyParticipator {
    private Map<String, Relation> relationWish;
    private Map<FLocation, Set<String>> claimOwnership = new ConcurrentHashMap<>();
    private transient Set<FPlayer> fplayers = Collections.newSetFromMap(new ConcurrentHashMap<>());
+   private Set<String> trustedPlayers = Collections.synchronizedSet(new HashSet<>());
    private Set<String> invites;
    private boolean open;
    private boolean peaceful;
@@ -408,6 +409,34 @@ public class Faction extends Entity implements EconomyParticipator {
          return Conf.considerFactionsReallyOfflineAfterXMinutes > 0.0
             && System.currentTimeMillis() < this.lastPlayerLoggedOffTime + Conf.considerFactionsReallyOfflineAfterXMinutes * 60000.0;
       }
+   }
+
+   public boolean trustsPlayer(FPlayer fplayer) {
+      return trustedPlayers.contains(fplayer.getName().toLowerCase());
+   }
+
+   public boolean addTrustedPlayer(FPlayer fplayer) {
+      if (this.isPlayerFreeType()) return false;
+      return trustedPlayers.add(fplayer.getName().toLowerCase());
+   }
+
+   public boolean removeTrustedPlayer(FPlayer fplayer) {
+      if (this.isPlayerFreeType()) return false;
+      return trustedPlayers.remove(fplayer.getName().toLowerCase());
+   }
+
+   public ArrayList<FPlayer> getTrustedFPlayers() {
+      ArrayList<FPlayer> ret = new ArrayList<>();
+      if (!this.isPlayerFreeType()){
+         for (String playerName : trustedPlayers) {
+            FPlayer fplayer = FPlayers.i.get(playerName);
+            if (this.trustsPlayer(fplayer)) {
+               ret.add(fplayer);
+            }
+         }
+      }
+
+      return ret;
    }
 
    public void memberLoggedOff() {

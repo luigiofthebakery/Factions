@@ -3,8 +3,12 @@ package com.massivecraft.factions.cmd;
 import com.massivecraft.factions.Conf;
 import com.massivecraft.factions.P;
 import com.massivecraft.factions.integration.Econ;
+import com.massivecraft.factions.struct.AutomatableCommand;
 import com.massivecraft.factions.struct.Permission;
+import com.massivecraft.factions.zcore.MCommand;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class CmdHelp extends FCommand {
    public ArrayList<ArrayList<String>> helpPages;
@@ -51,6 +55,7 @@ public class CmdHelp extends FCommand {
       pageLines.add(this.p.cmdBase.cmdHome.getUseageTemplate(true));
       pageLines.add(this.p.txt.parse("<i>Learn how to create a faction on the next page."));
       this.helpPages.add(pageLines);
+
       pageLines = new ArrayList<>();
       pageLines.add(this.p.cmdBase.cmdCreate.getUseageTemplate(true));
       pageLines.add(this.p.cmdBase.cmdDescription.getUseageTemplate(true));
@@ -62,6 +67,7 @@ public class CmdHelp extends FCommand {
       pageLines.add(this.p.txt.parse("<i>And don't forget to set your home:"));
       pageLines.add(this.p.cmdBase.cmdSethome.getUseageTemplate(true));
       this.helpPages.add(pageLines);
+
       if (Econ.isSetup() && Conf.econEnabled && Conf.bankEnabled) {
          pageLines = new ArrayList<>();
          pageLines.add("");
@@ -87,15 +93,42 @@ public class CmdHelp extends FCommand {
       pageLines.add(this.p.cmdBase.cmdTitle.getUseageTemplate(true));
       pageLines.add(this.p.txt.parse("<i>Player titles are just for fun. No rules connected to them."));
       this.helpPages.add(pageLines);
+
+      if (Conf.trustEnabled) {
+         pageLines = new ArrayList<>();
+         pageLines.add( p.txt.parse("<i>Trust allows you to give other players permission to build") );
+         pageLines.add( p.txt.parse("<i>in your faction's land. Trusting a player doesn't mean that") );
+         pageLines.add( p.txt.parse("<i>you get access to their land in exchange.") );
+         pageLines.add( p.cmdBase.cmdTrust.getUseageTemplate(true) );
+         pageLines.add( p.cmdBase.cmdUntrust.getUseageTemplate(true) );
+         this.helpPages.add(pageLines);
+      }
+
       pageLines = new ArrayList<>();
-      pageLines.add(this.p.cmdBase.cmdMap.getUseageTemplate(true));
-      pageLines.add(this.p.cmdBase.cmdBoom.getUseageTemplate(true));
+      pageLines.add( p.txt.parse("<i>The new automatic system allows you to use commands"));
+      pageLines.add( p.txt.parse("<i>automatically when moving between chunks."));
+      pageLines.add( p.cmdBase.cmdAuto.getUseageTemplate(true) );
+      pageLines.add( p.txt.parse("<i>Supported commands:"));
+      for (AutomatableCommand action : p.cmdBase.cmdAuto.actions) {
+         pageLines.add( action.getUseageTemplate(Arrays.asList(p.cmdBase, p.cmdBase.cmdAuto), false));
+      }
+      this.helpPages.add(pageLines);
+
+      pageLines = new ArrayList<>();
       pageLines.add(this.p.cmdBase.cmdOwner.getUseageTemplate(true));
-      pageLines.add(this.p.cmdBase.cmdOwnerList.getUseageTemplate(true));
       pageLines.add(this.p.txt.parse("<i>Claimed land with ownership set is further protected so"));
       pageLines.add(this.p.txt.parse("<i>that only the owner(s), faction admin, and possibly the"));
       pageLines.add(this.p.txt.parse("<i>faction moderators have full access."));
+      for (MCommand<?> subcommand : p.cmdBase.cmdOwner.subCommands) {
+         pageLines.add( subcommand.getUseageTemplate(Arrays.asList(p.cmdBase, p.cmdBase.cmdOwner), true));
+      }
       this.helpPages.add(pageLines);
+
+      pageLines = new ArrayList<>();
+      pageLines.add(this.p.cmdBase.cmdMap.getUseageTemplate(true));
+      pageLines.add(this.p.cmdBase.cmdBoom.getUseageTemplate(true));
+      this.helpPages.add(pageLines);
+
       pageLines = new ArrayList<>();
       pageLines.add(this.p.cmdBase.cmdDisband.getUseageTemplate(true));
       pageLines.add("");
@@ -107,6 +140,7 @@ public class CmdHelp extends FCommand {
       pageLines.add(this.p.txt.parse("<i>If BOTH factions choose \"ally\" you will be allies."));
       pageLines.add(this.p.txt.parse("<i>If ONE faction chooses \"enemy\" you will be enemies."));
       this.helpPages.add(pageLines);
+
       pageLines = new ArrayList<>();
       pageLines.add(this.p.txt.parse("<i>You can never hurt members or allies."));
       pageLines.add(this.p.txt.parse("<i>You can not hurt neutrals in their own territory."));
@@ -118,6 +152,7 @@ public class CmdHelp extends FCommand {
       pageLines.add(this.p.txt.parse("<i>The power of a faction determines how much land it can hold."));
       pageLines.add(this.p.txt.parse("<i>You can claim land from factions with too little power."));
       this.helpPages.add(pageLines);
+
       pageLines = new ArrayList<>();
       pageLines.add(this.p.txt.parse("<i>Only faction members can build and destroy in their own"));
       pageLines.add(this.p.txt.parse("<i>territory. Usage of the following items is also restricted:"));
@@ -129,6 +164,7 @@ public class CmdHelp extends FCommand {
       pageLines.add(this.p.txt.parse("<i>As dispensers are protected, you can create traps without"));
       pageLines.add(this.p.txt.parse("<i>worrying about those arrows getting stolen."));
       this.helpPages.add(pageLines);
+
       pageLines = new ArrayList<>();
       pageLines.add("Finally some commands for the server admins:");
       pageLines.add(this.p.cmdBase.cmdBypass.getUseageTemplate(true));
@@ -142,6 +178,7 @@ public class CmdHelp extends FCommand {
       );
       pageLines.add(this.p.cmdBase.cmdPeaceful.getUseageTemplate(true));
       this.helpPages.add(pageLines);
+
       pageLines = new ArrayList<>();
       pageLines.add(this.p.txt.parse("<i>More commands for server admins:"));
       pageLines.add(this.p.cmdBase.cmdChatSpy.getUseageTemplate(true));
@@ -150,6 +187,7 @@ public class CmdHelp extends FCommand {
       pageLines.add(this.p.cmdBase.cmdPowerBoost.getUseageTemplate(true));
       pageLines.add(this.p.cmdBase.cmdConfig.getUseageTemplate(true));
       this.helpPages.add(pageLines);
+
       pageLines = new ArrayList<>();
       pageLines.add(this.p.txt.parse("<i>Even more commands for server admins:"));
       pageLines.add(this.p.cmdBase.cmdLock.getUseageTemplate(true));

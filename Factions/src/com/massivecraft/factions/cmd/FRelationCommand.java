@@ -18,12 +18,25 @@ public abstract class FRelationCommand extends FCommand {
       this.disableOnLock = true;
       this.senderMustBePlayer = true;
       this.senderMustBeMember = false;
-      this.senderMustBeModerator = true;
+      this.senderMustBeModerator = false;
       this.senderMustBeAdmin = false;
    }
 
    @Override
    public void perform() {
+      boolean hasMinRole = true;
+      if (this.targetRelation == Relation.NEUTRAL) {
+         hasMinRole = this.assertMinRole(Conf.neutralMinRole);
+      } else if (this.targetRelation == Relation.ALLY) {
+         hasMinRole = this.assertMinRole(Conf.allyMinRole);
+      } else if (this.targetRelation == Relation.ENEMY) {
+         hasMinRole = this.assertMinRole(Conf.enemyMinRole);
+      }
+
+      if (!hasMinRole) {
+         return;
+      }
+
       Faction them = this.argAsFaction(0);
       if (them != null) {
          if (!them.isNormal()) {

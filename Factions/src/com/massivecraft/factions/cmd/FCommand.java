@@ -42,6 +42,18 @@ public abstract class FCommand extends MCommand<P> {
       super.execute(sender, args, commandChain);
    }
 
+   public void prepare(CommandSender sender, List<String> args, List<MCommand<?>> commandChain) {
+      if (sender instanceof Player) {
+         this.fme = FPlayers.i.get((Player)sender);
+         this.myFaction = this.fme.getFaction();
+      } else {
+         this.fme = null;
+         this.myFaction = null;
+      }
+
+      super.prepare(sender, args, commandChain);
+   }
+
    @Override
    public boolean isEnabled() {
       if (this.p.getLocked() && this.disableOnLock) {
@@ -88,7 +100,7 @@ public abstract class FCommand extends MCommand<P> {
       if (this.me == null) {
          return true;
       } else if (!this.fme.hasFaction()) {
-         this.sendMessage("You are not member of any faction.");
+         this.msg("<b>You are not member of any faction.");
          return false;
       } else {
          return true;
@@ -99,7 +111,7 @@ public abstract class FCommand extends MCommand<P> {
       if (this.me == null) {
          return true;
       } else if (this.fme.getRole().value < role.value) {
-         this.msg("<b>You <h>must be " + role + "<b> to " + this.getHelpShort() + ".", new Object[0]);
+         this.msg("<b>You must be <h>" + role + "<b> to " + this.getHelpShort() + ".", new Object[0]);
          return false;
       } else {
          return true;

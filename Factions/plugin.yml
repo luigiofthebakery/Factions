@@ -75,7 +75,10 @@ permissions:
       factions.noboom: true
       factions.open: true
       factions.owner: true
-      factions.ownerlist: true
+      factions.owner.list: true
+      factions.owner.add: true
+      factions.owner.remove: true
+      factions.owner.clear: true
       factions.power: true
       factions.power.any: true
       factions.relation: true
@@ -86,12 +89,20 @@ permissions:
       factions.version: true
       factions.unclaim: true
       factions.unclaimall: true
+      factions.trust: true
+      factions.untrust: true
+      factions.auto: true
+      factions.auto.claim: true
+      factions.auto.unclaim: true
+      factions.auto.owner.*: true
   factions.admin:
     description: hand over your admin rights
   factions.admin.any:
     description: give or revoke admin status for any player in any faction
   factions.autoclaim:
     description: auto-claim land as you walk around
+    children:
+      factions.auto.claim: true
   factions.bypass:
     description: enable admin bypass mode
   factions.chat:
@@ -188,8 +199,18 @@ permissions:
   factions.open:
     description: switch if invitation is required to join
   factions.owner:
-    description: set ownership of claimed land
-  factions.ownerlist:
+    children:
+      factions.owner.add: true
+      factions.owner.remove: true
+      factions.owner.clear: true
+      factions.owner.list: true
+  factions.owner.add:
+    description: add an owner to claimed land
+  factions.owner.remove:
+    description: remove an owner from claimed land
+  factions.owner.clear:
+    description: clear ownership of claimed land
+  factions.owner.list:
     description: list owner(s) of this claimed land
   factions.ownershipbypass:
     description: bypass ownership restrictions within own faction's territory
@@ -227,3 +248,30 @@ permissions:
     description: unclaim the land where you are standing
   factions.unclaimall:
     description: unclaim all of your factions land
+  factions.trust:
+    description: trust a player
+  factions.untrust:
+    description: remove a trusted player
+  factions.auto:
+    description: do a specified action automatically
+  factions.auto.claim:
+    description: auto-claim land as you walk around
+  factions.auto.unclaim:
+    description: unclaim the land automatically
+  factions.auto.owner.*:
+    children:
+      factions.auto.owner: true
+      factions.auto.owner.add: true
+      factions.auto.owner.remove: true
+      factions.auto.owner.clear: true
+      factions.auto.owner.list: true
+  factions.auto.owner:
+    description: clear auto owner commands
+  factions.auto.owner.add:
+    description: add an owner automatically
+  factions.auto.owner.remove:
+    description: remove an owner automatically
+  factions.auto.owner.clear:
+    description: clear ownership of claimed land
+  factions.auto.owner.list:
+    description: list ownership of claimed land

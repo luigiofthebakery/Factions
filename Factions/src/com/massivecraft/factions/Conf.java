@@ -5,6 +5,9 @@ import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.massivecraft.factions.struct.NotificationPosition;
+import com.massivecraft.factions.struct.Role;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -18,6 +21,7 @@ public class Conf {
    public static ChatColor colorEnemy = ChatColor.RED;
    public static ChatColor colorPeaceful = ChatColor.GOLD;
    public static ChatColor colorWar = ChatColor.DARK_RED;
+   public static ChatColor colorTrusted = ChatColor.BLUE;
    public static double powerPlayerMax = 10.0;
    public static double powerPlayerMin = -10.0;
    public static double powerPlayerStarting = 0.0;
@@ -152,7 +156,6 @@ public class Conf {
    public static boolean wildernessDenyEndermanBlocks = false;
    public static boolean ownedAreasEnabled = true;
    public static int ownedAreasLimitPerFaction = 0;
-   public static boolean ownedAreasModeratorsCanSet = false;
    public static boolean ownedAreaModeratorsBypass = true;
    public static boolean ownedAreaDenyBuild = true;
    public static boolean ownedAreaPainBuild = false;
@@ -163,6 +166,32 @@ public class Conf {
    public static boolean ownedMessageOnBorder = true;
    public static boolean ownedMessageInsideTerritory = true;
    public static boolean ownedMessageByChunk = false;
+   public static boolean trustEnabled = true;
+   public static boolean trustDenyBuild = false;
+   public static boolean trustProtectMaterials = false;
+   public static boolean trustDenyUseage = false;
+
+   public static Role claimMinRole = Role.MODERATOR;
+   public static Role claimRadiusMinRole = Role.MODERATOR;
+   public static Role unclaimMinRole = Role.MODERATOR;
+   public static Role trustMinRole = Role.ADMIN;
+   public static Role untrustMinRole = Role.ADMIN;
+   public static Role ownerAddMinRole = Role.MODERATOR;
+   public static Role ownerRemoveMinRole = Role.MODERATOR;
+   public static Role ownerClearMinRole = Role.ADMIN;
+   public static Role ownerListMinRole = Role.NORMAL;
+   public static Role allyMinRole = Role.MODERATOR;
+   public static Role neutralMinRole = Role.MODERATOR;
+   public static Role enemyMinRole = Role.MODERATOR;
+
+   public static Role autoClaimMinRole = Role.MODERATOR;
+   public static Role autoUnclaimMinRole = Role.ADMIN;
+   public static Role autoOwnerAddMinRole = Role.MODERATOR;
+   public static Role autoOwnerRemoveMinRole = Role.NORMAL;
+   public static Role autoOwnerClearMinRole = Role.ADMIN;
+   public static Role autoOwnerListMinRole = Role.NORMAL;
+
+   public static NotificationPosition defaultNotificationPosition = NotificationPosition.CHAT;
    public static boolean pistonProtectionThroughDenyBuild = true;
    public static Set<Material> territoryProtectedMaterials = EnumSet.noneOf(Material.class);
    public static Set<Material> territoryDenyUseageMaterials = EnumSet.noneOf(Material.class);

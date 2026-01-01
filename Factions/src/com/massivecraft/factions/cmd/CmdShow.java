@@ -37,6 +37,7 @@ public class CmdShow extends FCommand {
          Collection<FPlayer> admins = faction.getFPlayersWhereRole(Role.ADMIN);
          Collection<FPlayer> mods = faction.getFPlayersWhereRole(Role.MODERATOR);
          Collection<FPlayer> normals = faction.getFPlayersWhereRole(Role.NORMAL);
+         Collection<FPlayer> trustedPlayers = faction.getTrustedFPlayers();
          this.msg(this.p.txt.titleize(faction.getTag(this.fme)), new Object[0]);
          this.msg("<a>Description: <i>%s", new Object[]{faction.getDescription()});
          if (faction.isNormal()) {
@@ -99,6 +100,7 @@ public class CmdShow extends FCommand {
             this.sendMessage(enemyList);
             String onlineList = this.p.txt.parse("<a>") + "Members online: ";
             String offlineList = this.p.txt.parse("<a>") + "Members offline: ";
+            StringBuilder trustedPlayerListBuilder = new StringBuilder().append(this.p.txt.parse("<a>")).append("Trusted players: ");
 
             for (FPlayer follower : admins) {
                String listpart = follower.getNameAndTitle(this.fme) + this.p.txt.parse("<i>") + ", ";
@@ -137,6 +139,24 @@ public class CmdShow extends FCommand {
 
             this.sendMessage(onlineList);
             this.sendMessage(offlineList);
+            if (Conf.trustEnabled) {
+               for (FPlayer trustedPlayer : trustedPlayers) {
+                  trustedPlayerListBuilder
+                     .append(trustedPlayer.getColorTo(fme))
+                     .append(trustedPlayer.getName())
+                     .append(p.txt.parse("<i>")).append(", ");
+               }
+
+               String trustedPlayerList = trustedPlayerListBuilder.toString();
+
+               if (trustedPlayerList.endsWith(", ")) {
+                  trustedPlayerList = trustedPlayerList.substring(0, trustedPlayerList.length() - 2);
+               }
+
+               if (Conf.trustEnabled && !trustedPlayers.isEmpty()) {
+                  sendMessage(trustedPlayerList);
+               }
+            }
          }
       }
    }

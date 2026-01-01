@@ -11,7 +11,6 @@ public enum Permission {
    OWNERSHIP_BYPASS("ownershipbypass"),
    ADMIN("admin"),
    ADMIN_ANY("admin.any"),
-   AUTOCLAIM("autoclaim"),
    BYPASS("bypass"),
    CHAT("chat"),
    CHATSPY("chatspy"),
@@ -48,7 +47,10 @@ public enum Permission {
    NO_BOOM("noboom"),
    OPEN("open"),
    OWNER("owner"),
-   OWNERLIST("ownerlist"),
+   OWNER_ADD("owner.add"),
+   OWNER_REMOVE("owner.remove"),
+   OWNER_LIST("owner.list"),
+   OWNER_CLEAR("owner.clear"),
    SET_PEACEFUL("setpeaceful"),
    SET_PERMANENT("setpermanent"),
    SET_PERMANENTPOWER("setpermanentpower"),
@@ -65,7 +67,17 @@ public enum Permission {
    TITLE("title"),
    UNCLAIM("unclaim"),
    UNCLAIM_ALL("unclaimall"),
-   VERSION("version");
+   VERSION("version"),
+   TRUST("trust"),
+   UNTRUST("untrust"),
+   AUTO("auto"),
+   CLAIM_AUTO("auto.claim"),
+   UNCLAIM_AUTO("auto.unclaim"),
+   OWNER_AUTO("auto.owner"),
+   OWNER_ADD_AUTO("auto.owner.add"),
+   OWNER_REMOVE_AUTO("auto.owner.remove"),
+   OWNER_LIST_AUTO("auto.owner.list"),
+   OWNER_CLEAR_AUTO("auto.owner.clear");
 
    public final String node;
 

@@ -1,17 +1,14 @@
 package com.massivecraft.factions;
 
 import com.google.gson.reflect.TypeToken;
+import com.massivecraft.factions.iface.RelationParticipator;
 import com.massivecraft.factions.integration.LWCFeatures;
 import com.massivecraft.factions.struct.Relation;
 import com.massivecraft.factions.util.AsciiCompass;
 import com.massivecraft.factions.zcore.util.DiscUtil;
 import java.io.File;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -136,7 +133,16 @@ public class Board {
       return ret;
    }
 
-   public static ArrayList<String> getMap(Faction faction, FLocation flocation, double inDegrees) {
+   public static ArrayList<String> getMap(RelationParticipator player, FLocation flocation, double inDegrees) {
+      Faction faction;
+      if (player instanceof FPlayer) {
+         faction = ((FPlayer)player).getFaction();
+      } else if (player instanceof Faction) {
+         faction = (Faction)player;
+      } else {
+         return new ArrayList<>();
+      }
+
       ArrayList<String> ret = new ArrayList<>();
       Faction factionLoc = getFactionAt(flocation);
       ret.add(P.p.txt.titleize("(" + flocation.getCoordString() + ") " + factionLoc.getTag(faction)));
@@ -161,7 +167,7 @@ public class Board {
             } else {
                FLocation flocationHere = topLeft.getRelative(dx, dz);
                Faction factionHere = getFactionAt(flocationHere);
-               Relation relation = faction.getRelationTo(factionHere);
+               Relation relation = player.getRelationTo(factionHere);
                if (factionHere.isNone()) {
                   row = row + ChatColor.GRAY + "-";
                } else if (factionHere.isSafeZone()) {
@@ -178,7 +184,7 @@ public class Board {
                   }
 
                   char tag = fList.get(factionHere.getTag());
-                  row = row + factionHere.getColorTo(faction) + "" + tag;
+                  row = row + factionHere.getColorTo(player) + "" + tag;
                } else {
                   row = row + ChatColor.GRAY + "-";
                }

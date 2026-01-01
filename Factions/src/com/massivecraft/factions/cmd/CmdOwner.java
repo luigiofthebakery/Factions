@@ -1,69 +1,105 @@
 package com.massivecraft.factions.cmd;
 
-import com.massivecraft.factions.Board;
-import com.massivecraft.factions.Conf;
-import com.massivecraft.factions.FLocation;
-import com.massivecraft.factions.FPlayer;
-import com.massivecraft.factions.Faction;
-import com.massivecraft.factions.integration.SpoutFeatures;
+import com.massivecraft.factions.*;
+import com.massivecraft.factions.struct.AutoTriggerType;
+import com.massivecraft.factions.struct.AutomatableCommand;
 import com.massivecraft.factions.struct.Permission;
 import com.massivecraft.factions.struct.Role;
+import com.massivecraft.factions.zcore.MCommand;
 
-public class CmdOwner extends FCommand {
+import java.util.ArrayList;
+import java.util.List;
+
+public class CmdOwner extends AutomatableCommand {
+   private final CmdOwnerList cmdOwnerList;
+   private final CmdOwnerAdd cmdOwnerAdd;
+   private final CmdOwnerRemove cmdOwnerRemove;
+   private final CmdOwnerClear cmdOwnerClear;
+
    public CmdOwner() {
       this.aliases.add("owner");
+
+      this.optionalArgs.put("add/remove/clear/list", "");
       this.optionalArgs.put("player name", "you");
+
       this.permission = Permission.OWNER.node;
       this.disableOnLock = true;
       this.senderMustBePlayer = true;
       this.senderMustBeMember = false;
       this.senderMustBeModerator = false;
       this.senderMustBeAdmin = false;
+
+      this.cmdOwnerList = new CmdOwnerList();
+      this.cmdOwnerAdd = new CmdOwnerAdd();
+      this.cmdOwnerRemove = new CmdOwnerRemove();
+      this.cmdOwnerClear = new CmdOwnerClear();
+
+      this.subCommands.add(this.cmdOwnerList);
+      this.subCommands.add(this.cmdOwnerAdd);
+      this.subCommands.add(this.cmdOwnerRemove);
+      this.subCommands.add(this.cmdOwnerClear);
+
+      this.autoPermission = Permission.OWNER_AUTO.node;
+      this.autoTriggerType = AutoTriggerType.CHUNK_BOUNDARY;
+      this.incompatibleWith = new ArrayList<>();
    }
 
    @Override
    public void perform() {
-      boolean hasBypass = this.fme.isAdminBypassing();
-      if (hasBypass || this.assertHasFaction()) {
-         if (!Conf.ownedAreasEnabled) {
-            this.fme.msg("<b>Sorry, but owned areas are disabled on this server.");
-         } else if (!hasBypass && Conf.ownedAreasLimitPerFaction > 0 && this.myFaction.getCountOfClaimsWithOwners() >= Conf.ownedAreasLimitPerFaction) {
-            this.fme.msg("<b>Sorry, but you have reached the server's <h>limit of %d <b>owned areas per faction.", Conf.ownedAreasLimitPerFaction);
-         } else if (hasBypass || this.assertMinRole(Conf.ownedAreasModeratorsCanSet ? Role.MODERATOR : Role.ADMIN)) {
-            FLocation flocation = new FLocation(this.fme);
-            Faction factionHere = Board.getFactionAt(flocation);
-            if (factionHere != this.myFaction) {
-               if (!hasBypass) {
-                  this.fme.msg("<b>This land is not claimed by your faction, so you can't set ownership of it.");
-                  return;
-               }
-
-               if (!factionHere.isNormal()) {
-                  this.fme.msg("<b>This land is not claimed by a faction. Ownership is not possible.");
-                  return;
-               }
-            }
-
-            FPlayer target = this.argAsBestFPlayerMatch(0, this.fme);
-            if (target != null) {
-               String playerName = target.getName();
-               if (target.getFaction() != this.myFaction) {
-                  this.fme.msg("%s<i> is not a member of this faction.", playerName);
-               } else if (this.args.isEmpty() && this.myFaction.doesLocationHaveOwnersSet(flocation)) {
-                  this.myFaction.clearClaimOwnership(flocation);
-                  SpoutFeatures.updateOwnerListLoc(flocation);
-                  this.fme.msg("<i>You have cleared ownership for this claimed area.");
-               } else if (this.myFaction.isPlayerInOwnerList(playerName, flocation)) {
-                  this.myFaction.removePlayerAsOwner(playerName, flocation);
-                  SpoutFeatures.updateOwnerListLoc(flocation);
-                  this.fme.msg("<i>You have removed ownership of this claimed land from %s<i>.", playerName);
-               } else if (this.payForCommand(Conf.econCostOwner, "to set ownership of claimed land", "for setting ownership of claimed land")) {
-                  this.myFaction.setPlayerAsOwner(playerName, flocation);
-                  SpoutFeatures.updateOwnerListLoc(flocation);
-                  this.fme.msg("<i>You have added %s<i> to the owner list for this claimed land.", playerName);
-               }
-            }
-         }
+      if (!Conf.ownedAreasEnabled) {
+         this.fme.msg("<b>Sorry, but owned areas are disabled on this server.");
+         return;
       }
+
+      if (args.isEmpty()) {
+         this.fme.msg("<b>To few arguments. <i>Use like this:");
+         sender.sendMessage(this.getUseageTemplate());
+         return;
+      }
+
+      String invalidArg = args.get(0);
+      this.msg("<b>Strange argument \"<p>%s<b>\". <i>Use the command like this:", invalidArg);
+      sender.sendMessage(this.getUseageTemplate());
    }
+
+   @Override
+   public boolean onAutoEnable(FPlayer player) {
+      boolean preCheck = super.onAutoEnable(player);
+
+      if (!preCheck) {
+         return false;
+      }
+
+      if (!Conf.ownedAreasEnabled) {
+         this.fme.msg("<b>Sorry, but owned areas are disabled on this server.");
+         return false;
+      }
+
+      if (!fme.isAdminBypassing() && !this.assertHasFaction()) {
+         return false;
+      }
+
+      if (player.getAutoActions().stream().noneMatch(action ->
+         this.subCommands.stream().anyMatch(subCommand -> subCommand.getClass().equals(action.getCommand().getClass())))) {
+         player.msg("<i>There are no owner-related automatic actions to turn off.");
+         player.msg(getUseageTemplate(true));
+         return false;
+      }
+
+      for (MCommand<?> command : subCommands) {
+         if (!(command instanceof AutomatableCommand)) continue;
+
+         player.removeAutoAction((AutomatableCommand) command);
+      }
+
+      player.msg("<i>Turned off all owner-related automatic actions.");
+
+      return false;
+   }
+
+   @Override
+   public boolean onAutoDisable(FPlayer player) { return true; }
+
+   @Override
+   public boolean doArgsMatch(List<String> args1, List<String> args2) { return true; }
 }
