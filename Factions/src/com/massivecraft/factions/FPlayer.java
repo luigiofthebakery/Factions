@@ -129,7 +129,7 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator {
       if (Factions.i.exists(this.getFactionId())) {
          Faction currentFaction = this.getFaction();
          currentFaction.removeFPlayer(this);
-         if (currentFaction.isNormal()) {
+         if (currentFaction.isNormal() && Conf.shouldClearOwnershipOnLeave) {
             currentFaction.clearClaimOwnership(this.getId());
          }
       }

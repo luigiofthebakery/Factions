@@ -172,6 +172,8 @@ public class Conf {
    public static boolean trustDenyUseage = false;
    public static boolean trustCanHaveOwnership = true;
 
+   public static boolean shouldClearOwnershipOnLeave = false;
+
    public static Role claimMinRole = Role.MODERATOR;
    public static Role claimRadiusMinRole = Role.MODERATOR;
    public static Role unclaimMinRole = Role.MODERATOR;
