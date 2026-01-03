@@ -75,6 +75,8 @@ public class CmdUnclaim extends AutomatableCommand {
          if (this.assertMinRole(Conf.unclaimMinRole)) {
             if (this.myFaction != otherFaction) {
                this.msg("<b>You don't own this land.", new Object[0]);
+            } else if (!this.myFaction.playerHasOwnershipRights(this.fme, flocation) && !this.fme.getRole().isAtLeast(Conf.ownerClearMinRole)) {
+               this.msg("<b>You don't have ownership rights of this land or lack permissions to clear ownership.", new Object[0]);
             } else {
                LandUnclaimEvent unclaimEvent = new LandUnclaimEvent(flocation, otherFaction, this.fme);
                Bukkit.getServer().getPluginManager().callEvent(unclaimEvent);
