@@ -3,12 +3,15 @@ package com.massivecraft.factions.cmd;
 import com.massivecraft.factions.Conf;
 import com.massivecraft.factions.P;
 import com.massivecraft.factions.integration.SpoutFeatures;
+import com.massivecraft.factions.struct.NotificationPosition;
 import com.massivecraft.factions.struct.Permission;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Set;
+
+import com.massivecraft.factions.struct.Role;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -108,6 +111,34 @@ public class CmdConfig extends FCommand {
 
                target.set(null, newColor);
                success = "\"" + fieldName + "\" color option set to \"" + value.toUpperCase() + "\".";
+            } else if (target.getType() == NotificationPosition.class) {
+               NotificationPosition newPosition = null;
+
+               try {
+                  newPosition = NotificationPosition.valueOf(value.toUpperCase());
+               } catch (IllegalArgumentException e) {}
+
+               if (newPosition == null) {
+                  this.sendMessage("Cannot set \"" + fieldName + "\": \"" + value.toUpperCase() + "\" is not a valid notification position.");
+                  return;
+               }
+
+               target.set(null, newPosition);
+               success = "\"" + fieldName + "\" notification position option set to \"" + value.toUpperCase() + "\".";
+            } else if (target.getType() == Role.class) {
+               Role newRole = null;
+
+               try {
+                  newRole = Role.valueOf(value.toUpperCase());
+               } catch (IllegalArgumentException e) {}
+
+               if (newRole == null) {
+                  this.sendMessage("Cannot set \"" + fieldName + "\": \"" + value.toUpperCase() + "\" is not a valid notification position.");
+                  return;
+               }
+
+               target.set(null, newRole);
+               success = "\"" + fieldName + "\" role option set to \"" + value.toUpperCase() + "\".";
             } else {
                if (!(target.getGenericType() instanceof ParameterizedType)) {
                   this.sendMessage("\"" + fieldName + "\" is not a data type which can be modified with this command.");
