@@ -98,21 +98,20 @@ public class FactionsPlayerListener implements Listener {
                      SpoutFeatures.updateOwnerList(me);
                   }
                } else {
-                  Faction myFaction = me.getFaction();
-                  String ownersTo = myFaction.getOwnerListString(to);
+                  String ownersTo = factionTo.getOwnerListString(to);
                   if (changedFaction) {
                      me.sendFactionHereMessage();
                      if (Conf.ownedAreasEnabled
                         && Conf.ownedMessageOnBorder
                         && (!spoutClient || !Conf.spoutTerritoryOwnersShow)
-                        && myFaction == factionTo
+                        && me.canHaveOwnershipInFaction(factionTo)
                         && !ownersTo.isEmpty()) {
                         me.sendMessage(Conf.ownedLandMessage + ownersTo);
                      }
                   } else if (spoutClient && Conf.spoutTerritoryOwnersShow) {
                      SpoutFeatures.updateOwnerList(me);
-                  } else if (Conf.ownedAreasEnabled && Conf.ownedMessageInsideTerritory && factionFrom == factionTo && myFaction == factionTo) {
-                     String ownersFrom = myFaction.getOwnerListString(from);
+                  } else if (Conf.ownedAreasEnabled && Conf.ownedMessageInsideTerritory && factionFrom == factionTo && me.canHaveOwnershipInFaction(factionTo)) {
+                     String ownersFrom = factionFrom.getOwnerListString(from);
                      if (Conf.ownedMessageByChunk || !ownersFrom.equals(ownersTo)) {
                         if (!ownersTo.isEmpty()) {
                            me.sendMessage(Conf.ownedLandMessage + ownersTo);

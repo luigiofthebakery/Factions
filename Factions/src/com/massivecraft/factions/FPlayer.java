@@ -274,6 +274,10 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator {
       }
    }
 
+   public boolean canHaveOwnershipInFaction(Faction faction) {
+      return this.getFaction().equals(faction) || (Conf.trustCanHaveOwnership && faction.trustsPlayer(this));
+   }
+
    public double getPower() {
       this.updatePower();
       return this.power;

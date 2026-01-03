@@ -31,22 +31,22 @@ public class CmdOwnerList extends AutomatableCommand {
    @Override
    public void perform() {
       boolean hasBypass = this.fme.isAdminBypassing();
-      if (hasBypass || (this.assertHasFaction() && this.assertMinRole(Conf.ownerListMinRole))) {
+      if (hasBypass || (this.assertMinRole(Conf.ownerListMinRole))) {
          if (!Conf.ownedAreasEnabled) {
             this.fme.msg("<b>Sorry, but owned areas are disabled on this server.");
          } else {
             FLocation flocation = this.fme.getLastStoodAt();
             Faction factionHere = Board.getFactionAt(flocation);
-            if (factionHere != this.myFaction) {
+            if (!this.fme.canHaveOwnershipInFaction(factionHere)) {
                if (!hasBypass) {
                   this.fme.msg("<b>This land is not claimed by your faction.");
                   return;
                }
+            }
 
-               if (!factionHere.isNormal()) {
-                  this.fme.msg("<i>This land is not claimed by any faction, thus no owners.");
-                  return;
-               }
+            if (!factionHere.isNormal()) {
+               this.fme.msg("<i>This land is not claimed by any faction, thus no owners.");
+               return;
             }
 
             String owners = factionHere.getOwnerListString(flocation);
@@ -72,7 +72,7 @@ public class CmdOwnerList extends AutomatableCommand {
          return false;
       }
 
-      if (!player.isAdminBypassing() && (!this.assertHasFaction() || !this.assertMinRole(Conf.autoOwnerListMinRole))) {
+      if (!player.isAdminBypassing() && (!this.assertMinRole(Conf.autoOwnerListMinRole))) {
          return false;
       }
 

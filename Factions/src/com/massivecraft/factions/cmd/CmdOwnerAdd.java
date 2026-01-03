@@ -57,8 +57,8 @@ public class CmdOwnerAdd extends AutomatableCommand {
             FPlayer target = this.argAsBestFPlayerMatch(0, fme);
             if (target != null) {
                String playerName = target.getName();
-               if (target.getFaction() != factionHere) {
-                  this.fme.msg("%s<i> %s not a member of %s<i>.", target.describeTo(fme), target.equals(fme) ? "are" : "is", factionHere.describeTo(fme));
+               if (!target.canHaveOwnershipInFaction(factionHere)) {
+                  this.fme.msg("%s<i> can't own land in %s<i>.", target.describeTo(fme), factionHere.describeTo(fme));
                } else if (factionHere.isPlayerInOwnerList(playerName, flocation)) {
                   this.fme.msg("%s<i> %s already an owner of this land<i>.", target.describeTo(fme), target.equals(fme) ? "are" : "is");
                } else if (this.payForCommand(Conf.econCostOwner, "to set ownership of claimed land", "for setting ownership of claimed land")) {

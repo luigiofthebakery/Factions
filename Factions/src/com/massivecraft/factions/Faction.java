@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -590,11 +592,19 @@ public class Faction extends Entity implements EconomyParticipator {
    }
 
    public Set<String> getOwnerList(FLocation loc) {
-      return this.claimOwnership.get(loc);
+      Faction factionHere = Board.getFactionAt(loc);
+      if (this.claimOwnership.get(loc) == null) {
+         return null;
+      }
+
+      return this.claimOwnership.get(loc).stream().filter(s -> {
+         FPlayer fPlayer = FPlayers.i.getBestIdMatch(s);
+         return fPlayer != null && fPlayer.canHaveOwnershipInFaction(factionHere);
+      }).collect(Collectors.toSet());
    }
 
    public String getOwnerListString(FLocation loc) {
-      Set<String> ownerData = this.claimOwnership.get(loc);
+      Set<String> ownerData = this.getOwnerList(loc);
       if (ownerData != null && !ownerData.isEmpty()) {
          String ownerList = "";
 
@@ -611,15 +621,22 @@ public class Faction extends Entity implements EconomyParticipator {
    }
 
    public boolean playerHasOwnershipRights(FPlayer fplayer, FLocation loc) {
-      if (fplayer.getFaction() != this
-         || !fplayer.getRole().isAtLeast(Conf.ownedAreaModeratorsBypass ? Role.MODERATOR : Role.ADMIN) && !Permission.OWNERSHIP_BYPASS.has(fplayer.getPlayer())
-         )
+      if (!fplayer.getRole().isAtLeast(Conf.ownedAreaModeratorsBypass ? Role.MODERATOR : Role.ADMIN) && !Permission.OWNERSHIP_BYPASS.has(fplayer.getPlayer()))
        {
          if (this.claimOwnership.isEmpty()) {
             return true;
          } else {
-            Set<String> ownerData = this.claimOwnership.get(loc);
-            return ownerData == null || ownerData.isEmpty() || ownerData.contains(fplayer.getName().toLowerCase());
+            Set<String> ownerData = this.getOwnerList(loc);
+
+            if (ownerData == null || ownerData.isEmpty()) {
+               return true;
+            }
+
+            if (fplayer.canHaveOwnershipInFaction(Board.getFactionAt(loc)) && ownerData.contains(fplayer.getName().toLowerCase())) {
+               return true;
+            }
+
+            return false;
          }
       } else {
          return true;

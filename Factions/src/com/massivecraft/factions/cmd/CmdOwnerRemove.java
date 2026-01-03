@@ -55,9 +55,7 @@ public class CmdOwnerRemove extends AutomatableCommand {
             FPlayer target = this.argAsBestFPlayerMatch(0, this.fme);
             if (target != null) {
                String playerName = target.getName();
-               if (target.getFaction() != factionHere) {
-                  this.fme.msg("%s<i> %s not a member of %s<i>.", target.describeTo(fme), target.equals(fme) ? "are" : "is", factionHere.describeTo(fme));
-               } else if (factionHere.isPlayerInOwnerList(playerName, flocation)) {
+               if (factionHere.isPlayerInOwnerList(playerName, flocation)) {
                   factionHere.removePlayerAsOwner(playerName, flocation);
                   SpoutFeatures.updateOwnerListLoc(flocation);
                   this.fme.msg("<i>You have removed ownership of this claimed land from %s<i>.", target.describeTo(fme));

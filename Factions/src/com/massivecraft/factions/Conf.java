@@ -170,6 +170,7 @@ public class Conf {
    public static boolean trustDenyBuild = false;
    public static boolean trustProtectMaterials = false;
    public static boolean trustDenyUseage = false;
+   public static boolean trustCanHaveOwnership = true;
 
    public static Role claimMinRole = Role.MODERATOR;
    public static Role claimRadiusMinRole = Role.MODERATOR;
