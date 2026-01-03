@@ -474,7 +474,9 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator {
             return true;
          }
 
-         if (myFaction != forFaction) {
+         if (forFaction.isNone()) {
+            error = P.p.txt.parse("<b>You can't claim land for <h>%s<b>.", forFaction.getTag());
+         } else if (myFaction != forFaction) {
             error = P.p.txt.parse("<b>You can't claim land for <h>%s<b>.", forFaction.describeTo(this));
          } else if (forFaction == currentFaction) {
             error = P.p.txt.parse("%s<i> already own this land.", forFaction.describeTo(this, true));
