@@ -158,7 +158,7 @@ public class P extends MPlugin {
 
                   File f = new File(dir, "factions" + now + ".zip");
                   ZipOutputStream out = new ZipOutputStream(new FileOutputStream(f));
-                  String[] fx = new String[]{"factions.json", "players.json", "board.json"};
+                  String[] fx = new String[]{"factions.json", "players.json", "board.json", "tags.json", "conf.json"};
 
                   for (String fxs : fx) {
                      ZipEntry e = new ZipEntry(fxs);
